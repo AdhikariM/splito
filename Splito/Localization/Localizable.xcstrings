@@ -165,6 +165,9 @@
     "Add an expense to get this party started." : {
       "extractionState" : "manual"
     },
+    "Add attachment" : {
+
+    },
     "Add expense" : {
 
     },
@@ -272,6 +275,12 @@
       "extractionState" : "manual"
     },
     "Choose from Library" : {
+
+    },
+    "Choose mode" : {
+
+    },
+    "Contact support" : {
 
     },
     "Contact Support" : {
@@ -395,6 +404,9 @@
       "extractionState" : "manual"
     },
     "Forgot password?" : {
+
+    },
+    "Gallery" : {
 
     },
     "get back" : {
@@ -616,6 +628,9 @@
     "Phone Number" : {
       "extractionState" : "manual"
     },
+    "Please choose your preferred mode to attach image with feedback" : {
+
+    },
     "Please enter a cost for your expense first!" : {
       "extractionState" : "manual"
     },
@@ -656,6 +671,9 @@
       "extractionState" : "manual"
     },
     "Remove" : {
+
+    },
+    "Remove All" : {
 
     },
     "Remove from group" : {

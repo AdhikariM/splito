@@ -33,15 +33,17 @@ class AccountHomeViewModel: BaseViewModel, ObservableObject {
     }
 
     func onContactUsTap() {
-        guard MFMailComposeViewController.canSendMail() else {
-            showToastFor(toast: ToastPrompt(type: .warning, title: "Warning", message: "Your device cannot send email."))
-            showMailToast = true
-            return
-        }
-        let logger = ddLoggerProvider.provideLogger()
-        logger.removeAllZipLogs()
-        logFilePath = logger.zipLogs()
-        showShareSheet = true
+        router.push(.FeedbackView)
+
+//        guard MFMailComposeViewController.canSendMail() else {
+//            showToastFor(toast: ToastPrompt(type: .warning, title: "Warning", message: "Your device cannot send email."))
+//            showMailToast = true
+//            return
+//        }
+//        let logger = ddLoggerProvider.provideLogger()
+//        logger.removeAllZipLogs()
+//        logFilePath = logger.zipLogs()
+//        showShareSheet = true
     }
 
     func showMailSendToast() {

@@ -72,15 +72,15 @@ public class StorageManager: ObservableObject {
     }
 
     public func updateImage(for type: ImageStoreType, id: String, url: String, imageData: Data) async throws -> String? {
-        try await deleteImage(imageUrl: url)
+        try await deleteAttachment(attachmentUrl: url)
 
         // Upload the new image asynchronously
         return try await uploadAttachment(for: type, id: id, attachmentData: imageData)
     }
 
-    public func deleteImage(imageUrl: String) async throws {
+    public func deleteAttachment(attachmentUrl: String) async throws {
         do {
-            let storageRef = storage.reference(forURL: imageUrl)
+            let storageRef = storage.reference(forURL: attachmentUrl)
             try await storageRef.delete()
             LogD("StorageManager: \(#function) Image deleted successfully.")
         } catch {

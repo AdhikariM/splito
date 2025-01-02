@@ -50,7 +50,7 @@ public class ExpenseRepository: ObservableObject {
             updatedExpense.imageUrl = uploadedImageUrl
         } else if let currentUrl = updatedExpense.imageUrl, newImageUrl == nil {
             // If there's a current image URL and we want to remove it, delete the image and set imageUrl empty
-            try await storageManager.deleteImage(imageUrl: currentUrl)
+            try await storageManager.deleteAttachment(attachmentUrl: currentUrl)
             updatedExpense.imageUrl = ""
         } else if let newImageUrl {
             // If a new image URL is explicitly passed, update it

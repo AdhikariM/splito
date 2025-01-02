@@ -20,4 +20,8 @@ public class FeedbackRepository: ObservableObject {
     public func uploadAttachment(attachmentId: String, attachmentData: Data, attachmentType: StorageManager.AttachmentType) async throws -> String? {
         return try await storageManager.uploadAttachment(for: .feedback, id: attachmentId, attachmentData: attachmentData, attachmentType: attachmentType)
     }
+
+    public func deleteAttachment(attachmentUrl: String) async throws {
+        try await storageManager.deleteAttachment(attachmentUrl: attachmentUrl)
+    }
 }

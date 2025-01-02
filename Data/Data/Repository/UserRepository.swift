@@ -61,7 +61,7 @@ public class UserRepository: ObservableObject {
         if let currentUrl = user.imageUrl, newImageUrl == nil {
             newUser.imageUrl = newImageUrl
 
-            _ = try await storageManager.deleteImage(imageUrl: currentUrl)
+            _ = try await storageManager.deleteAttachment(attachmentUrl: currentUrl)
             return try await performImageAction(imageData: imageData, user: newUser)
         } else {
             return try await performImageAction(imageData: imageData, user: newUser)

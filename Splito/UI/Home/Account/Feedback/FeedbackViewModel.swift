@@ -110,11 +110,25 @@ extension FeedbackViewModel {
         }
 
         if let urlIndex = attachmentsUrls.firstIndex(where: { $0.id == attachment.id }) {
+            let attachmentUrl = attachmentsUrls[urlIndex].url
             attachmentsUrls.remove(at: urlIndex)
+            deleteAttachment(attachmentUrl: attachmentUrl)
         }
 
         selectedAttachments.remove(at: index)
         uploadingAttachments.removeAll(where: { $0.id == attachment.id })
+    }
+
+    func deleteAttachment(attachmentUrl: String) {
+        Task {
+            do {
+                try await feedbackRepository.deleteAttachment(attachmentUrl: attachmentUrl)
+                LogD("FeedbackViewModel: \(#function) Attachment deleted successfully.")
+            } catch {
+                LogE("FeedbackViewModel: \(#function) Failed to delete attachment: \(error)")
+                showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: "Failed to remove attachment."))
+            }
+        }
     }
 
     func onRetryAttachment(_ attachment: Attachment) {
@@ -140,10 +154,7 @@ extension FeedbackViewModel {
             selectedAttachments.removeAll()
         }
     }
-}
 
-// MARK: - Helper Methods
-extension FeedbackViewModel {
     func upload(attachment: Attachment) {
         if uploadedAttachmentIDs.contains(attachment.id) {
             return

@@ -83,7 +83,7 @@ public class GroupRepository: ObservableObject {
         guard let groupId = group.id else { return "" }
 
         // Upload the image and get the image URL
-        return try await storageManager.uploadImage(for: .group, id: groupId, imageData: imageData) ?? ""
+        return try await storageManager.uploadAttachment(for: .group, id: groupId, attachmentData: imageData) ?? ""
     }
 
     public func addMemberToGroup(groupId: String, memberId: String) async throws {

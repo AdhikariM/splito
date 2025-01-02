@@ -76,11 +76,11 @@ extension FeedbackViewModel {
                         self?.showAlert = false
                         self?.router.pop()
                     }))
-                LogD("ActivityLogViewModel: \(#function) Activity logs fetched successfully.")
+                LogD("FeedbackViewModel: \(#function) Feedback submitted successfully.")
             } catch {
                 self?.showLoader = false
                 self?.showToastForError()
-                LogE("ActivityLogViewModel: \(#function) Failed to fetch activity logs: \(error).")
+                LogE("FeedbackViewModel: \(#function) Failed to submit feedback: \(error).")
             }
         }
     }
@@ -151,11 +151,11 @@ extension FeedbackViewModel {
 
         if let imageData = attachment.image?.jpegRepresentationData {
             let attachmentData = AttachmentData(data: imageData, attachment: attachment)
-            upload(attachmentData: attachmentData)
+            upload(attachmentData: attachmentData, attachmentType: .image)
         } else if let data = attachment.videoData {
             if data.count <= VIDEO_SIZE_LIMIT_IN_BYTES {
                 let attachmentData = AttachmentData(data: data, attachment: attachment)
-                upload(attachmentData: attachmentData)
+                upload(attachmentData: attachmentData, attachmentType: .video)
             } else {
                 selectedAttachments.removeAll { $0.id == attachment.id }
                 showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: "The video size exceeds the maximum allowed limit. Please select a smaller video."))
@@ -163,10 +163,25 @@ extension FeedbackViewModel {
         }
     }
 
-    func upload(attachmentData: AttachmentData) {
+    public func upload(attachmentData: AttachmentData, attachmentType: StorageManager.AttachmentType) {
         uploadingAttachments.append(attachmentData.attachment)
 
-        // Need to upload
+        Task {
+            do {
+                let attachmentId = attachmentData.attachment.id
+                let attachmentUrl = try await feedbackRepository.uploadAttachment(attachmentId: attachmentId, attachmentData: attachmentData.data, attachmentType: attachmentType)
+
+                // Update attachment URLs with the uploaded URL
+                if let attachmentUrl {
+                    self.attachmentsUrls.append(AttachmentInfo(id: attachmentId, url: attachmentUrl))
+                    self.uploadingAttachments.removeAll { $0.id == attachmentId }
+                }
+            } catch {
+                self.failedAttachments.append(attachmentData.attachment)
+                self.uploadingAttachments.removeAll { $0.id == attachmentData.attachment.id }
+                LogE("FeedbackViewModel: \(#function) Failed to upload attachment: \(error)")
+            }
+        }
     }
 }
 

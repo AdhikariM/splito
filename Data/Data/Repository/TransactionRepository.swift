@@ -71,7 +71,7 @@ public class TransactionRepository: ObservableObject {
 
     private func uploadImage(imageData: Data, transaction: Transactions) async throws -> String {
         guard let transactionId = transaction.id else { return "" }
-        return try await storageManager.uploadImage(for: .payment, id: transactionId, imageData: imageData) ?? ""
+        return try await storageManager.uploadAttachment(for: .payment, id: transactionId, attachmentData: imageData) ?? ""
     }
 
     private func hasTransactionChanged(_ transaction: Transactions, oldTransaction: Transactions) -> Bool {

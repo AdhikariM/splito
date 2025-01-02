@@ -63,7 +63,7 @@ public class ExpenseRepository: ObservableObject {
 
     private func uploadImage(imageData: Data, expense: Expense) async throws -> String {
         guard let expenseId = expense.id else { return "" }
-        return try await storageManager.uploadImage(for: .expense, id: expenseId, imageData: imageData) ?? ""
+        return try await storageManager.uploadAttachment(for: .expense, id: expenseId, attachmentData: imageData) ?? ""
     }
 
     private func hasExpenseChanged(_ expense: Expense, oldExpense: Expense) -> Bool {

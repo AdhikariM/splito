@@ -104,29 +104,24 @@ extension FeedbackViewModel {
         guard let index = selectedAttachments.firstIndex(where: { $0.id == attachment.id }) else {
             return
         }
-
         if let token = cancellable.removeValue(forKey: attachment.id) {
             token.cancel()
         }
 
         if let urlIndex = attachmentsUrls.firstIndex(where: { $0.id == attachment.id }) {
             let attachmentUrl = attachmentsUrls[urlIndex].url
-            attachmentsUrls.remove(at: urlIndex)
-            deleteAttachment(attachmentUrl: attachmentUrl)
-        }
 
-        selectedAttachments.remove(at: index)
-        uploadingAttachments.removeAll(where: { $0.id == attachment.id })
-    }
-
-    func deleteAttachment(attachmentUrl: String) {
-        Task {
-            do {
-                try await feedbackRepository.deleteAttachment(attachmentUrl: attachmentUrl)
-                LogD("FeedbackViewModel: \(#function) Attachment deleted successfully.")
-            } catch {
-                LogE("FeedbackViewModel: \(#function) Failed to delete attachment: \(error)")
-                showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: "Failed to remove attachment."))
+            Task { [weak self] in
+                do {
+                    try await self?.feedbackRepository.deleteAttachment(attachmentUrl: attachmentUrl)
+                    self?.attachmentsUrls.remove(at: urlIndex)
+                    self?.selectedAttachments.remove(at: index)
+                    self?.uploadingAttachments.removeAll(where: { $0.id == attachment.id })
+                    LogD("FeedbackViewModel: \(#function) Attachment deleted successfully.")
+                } catch {
+                    LogE("FeedbackViewModel: \(#function) Failed to delete attachment: \(error)")
+                    self?.showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: "Failed to remove attachment."))
+                }
             }
         }
     }
@@ -151,7 +146,29 @@ extension FeedbackViewModel {
         case .gallery:
             showImagePicker = true
         case .removeAll:
-            selectedAttachments.removeAll()
+            Task { [weak self] in
+                guard let self else { return }
+                for (_, token) in self.cancellable {
+                    token.cancel()
+                }
+                self.cancellable.removeAll()
+
+                for attachmentInfo in self.attachmentsUrls {
+                    do {
+                        try await self.feedbackRepository.deleteAttachment(attachmentUrl: attachmentInfo.url)
+                        LogD("FeedbackViewModel: \(#function) Attachment deleted successfully.")
+                    } catch {
+                        LogE("FeedbackViewModel: \(#function) Failed to delete attachment: \(error)")
+                        self.showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: "Failed to remove attachment."))
+                    }
+                }
+                
+                self.selectedAttachments.removeAll()
+                self.uploadingAttachments.removeAll()
+                self.attachmentsUrls.removeAll()
+                self.failedAttachments.removeAll()
+                self.uploadedAttachmentIDs.removeAll()
+            }
         }
     }
 
@@ -177,19 +194,19 @@ extension FeedbackViewModel {
     public func upload(attachmentData: AttachmentData, attachmentType: StorageManager.AttachmentType) {
         uploadingAttachments.append(attachmentData.attachment)
 
-        Task {
+        Task { [weak self] in
             do {
                 let attachmentId = attachmentData.attachment.id
-                let attachmentUrl = try await feedbackRepository.uploadAttachment(attachmentId: attachmentId, attachmentData: attachmentData.data, attachmentType: attachmentType)
+                let attachmentUrl = try await self?.feedbackRepository.uploadAttachment(attachmentId: attachmentId, attachmentData: attachmentData.data, attachmentType: attachmentType)
 
                 // Update attachment URLs with the uploaded URL
                 if let attachmentUrl {
-                    self.attachmentsUrls.append(AttachmentInfo(id: attachmentId, url: attachmentUrl))
-                    self.uploadingAttachments.removeAll { $0.id == attachmentId }
+                    self?.attachmentsUrls.append(AttachmentInfo(id: attachmentId, url: attachmentUrl))
+                    self?.uploadingAttachments.removeAll { $0.id == attachmentId }
                 }
             } catch {
-                self.failedAttachments.append(attachmentData.attachment)
-                self.uploadingAttachments.removeAll { $0.id == attachmentData.attachment.id }
+                self?.failedAttachments.append(attachmentData.attachment)
+                self?.uploadingAttachments.removeAll { $0.id == attachmentData.attachment.id }
                 LogE("FeedbackViewModel: \(#function) Failed to upload attachment: \(error)")
             }
         }

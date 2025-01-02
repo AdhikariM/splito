@@ -280,9 +280,6 @@
     "Choose mode" : {
 
     },
-    "Contact support" : {
-
-    },
     "Contact Support" : {
       "extractionState" : "manual"
     },
@@ -906,6 +903,9 @@
     },
     "Time to settle up! Track shared expenses and split them in seconds." : {
       "extractionState" : "manual"
+    },
+    "Title" : {
+
     },
     "to" : {
       "extractionState" : "manual"

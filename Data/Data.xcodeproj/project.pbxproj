@@ -11,7 +11,7 @@
 		21559CA42CBD05570039F127 /* ActivityLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21559CA32CBD05570039F127 /* ActivityLog.swift */; };
 		21559CAE2CBD2AED0039F127 /* ActivityLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21559CAD2CBD2AED0039F127 /* ActivityLogStore.swift */; };
 		21559CB02CBD2B400039F127 /* ActivityLogRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21559CAF2CBD2B400039F127 /* ActivityLogRepository.swift */; };
-		2163D3B02D265C25004B4F20 /* Attachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3AF2D265C25004B4F20 /* Attachment.swift */; };
+		2163D3B02D265C25004B4F20 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3AF2D265C25004B4F20 /* Feedback.swift */; };
 		2163D3B22D265CF9004B4F20 /* DeviceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3B12D265CF9004B4F20 /* DeviceInfo.swift */; };
 		2163D3B42D269E17004B4F20 /* FeedbackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3B32D269E17004B4F20 /* FeedbackStore.swift */; };
 		2163D3B62D269E2A004B4F20 /* FeedbackRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3B52D269E2A004B4F20 /* FeedbackRepository.swift */; };
@@ -75,7 +75,7 @@
 		21559CA32CBD05570039F127 /* ActivityLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLog.swift; sourceTree = "<group>"; };
 		21559CAD2CBD2AED0039F127 /* ActivityLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLogStore.swift; sourceTree = "<group>"; };
 		21559CAF2CBD2B400039F127 /* ActivityLogRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLogRepository.swift; sourceTree = "<group>"; };
-		2163D3AF2D265C25004B4F20 /* Attachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attachment.swift; sourceTree = "<group>"; };
+		2163D3AF2D265C25004B4F20 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		2163D3B12D265CF9004B4F20 /* DeviceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceInfo.swift; sourceTree = "<group>"; };
 		2163D3B32D269E17004B4F20 /* FeedbackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackStore.swift; sourceTree = "<group>"; };
 		2163D3B52D269E2A004B4F20 /* FeedbackRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackRepository.swift; sourceTree = "<group>"; };
@@ -202,7 +202,7 @@
 				D8CF5A202C1986250014E3AD /* Transaction.swift */,
 				21559CA32CBD05570039F127 /* ActivityLog.swift */,
 				D8D14A512BA0917D00F45FF2 /* SharedCode.swift */,
-				2163D3AF2D265C25004B4F20 /* Attachment.swift */,
+				2163D3AF2D265C25004B4F20 /* Feedback.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -550,7 +550,7 @@
 				21559CA42CBD05570039F127 /* ActivityLog.swift in Sources */,
 				D8A7CA802BA867F80014EC67 /* String+Extension.swift in Sources */,
 				D89BC2802D1C3DB200CDE86B /* DateTimeHelper.swift in Sources */,
-				2163D3B02D265C25004B4F20 /* Attachment.swift in Sources */,
+				2163D3B02D265C25004B4F20 /* Feedback.swift in Sources */,
 				213D0CCA2C89DBC800D65C73 /* Notification+Extension.swift in Sources */,
 				D895F2282CA297B900C2E4EB /* NetworkManager.swift in Sources */,
 				D8910E382BB6D1D300877CE0 /* ExpenseStore.swift in Sources */,

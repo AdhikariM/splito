@@ -9,6 +9,7 @@ import SwiftUI
 import BaseStyle
 import AVKit
 import Data
+import PhotosUI
 
 struct FeedbackView: View {
 
@@ -44,7 +45,6 @@ struct FeedbackView: View {
                         }
 
                         FeedbackDescriptionView(
-                            height: UIScreen.main.bounds.height/4,
                             isSelected: focusField == .description,
                             titleText: $viewModel.description)
                         .focused($focusField, equals: .description)
@@ -66,36 +66,37 @@ struct FeedbackView: View {
 
                         PrimaryButton(text: "Submit",
                                       isEnabled: viewModel.isValidTitle && viewModel.uploadingAttachments.isEmpty,
-                                      //                                  isEventEnabled: true,
-                                      showLoader: viewModel.showLoader,
-                                      onClick: viewModel.submitFeedback)
-                        .padding(.top, 12)
+                                      showLoader: viewModel.showLoader, onClick: viewModel.submitFeedback)
                     }
                     .padding([.horizontal, .bottom], 16)
                 }
             }
         }
+        .frame(maxWidth: isIpad ? 600 : nil, alignment: .center)
+        .frame(maxWidth: .infinity, alignment: .center)
         .background(surfaceColor)
         .alertView.alert(isPresented: $viewModel.showAlert, alertStruct: viewModel.alert)
         .toastView(toast: $viewModel.toast)
-        .onTapGesture {
-            UIApplication.shared.endEditing()
+        .toolbarRole(.editor)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                NavigationTitleTextView(text: "Contact support")
+            }
         }
         .onAppear {
             UIScrollView.appearance().keyboardDismissMode = .interactive
             focusField = .title
         }
-        .sheet(isPresented: $viewModel.showImagePicker) {
-            MultipleImageSelectionPickerView(onDismiss: { attachments in
-                viewModel.onImagePickerSheetDismiss(attachments: attachments)
-            }, isPresented: $viewModel.showImagePicker)
+        .onTapGesture {
+            UIApplication.shared.endEditing()
         }
-        .toolbarRole(.editor)
-        .navigationBarTitle("Contact support", displayMode: .inline)
+        .sheet(isPresented: $viewModel.showImagePicker) {
+            MultipleImageSelectionPickerView(onDismiss: viewModel.onImagePickerSheetDismiss(attachments:),
+                                             isPresented: $viewModel.showImagePicker)
+        }
     }
 
-    func getActionSheet(withRemoveAllOption: Bool,
-                        selection: @escaping ((FeedbackViewModel.ActionsOfSheet) -> Void)) -> ActionSheet {
+    func getActionSheet(withRemoveAllOption: Bool, selection: @escaping ((FeedbackViewModel.ActionsOfSheet) -> Void)) -> ActionSheet {
         let gallery: ActionSheet.Button = .default(
             Text("Gallery")) {
                 selection(.gallery)
@@ -117,16 +118,13 @@ struct FeedbackTitleFieldView: View {
     @Binding var titleText: String
 
     var isSelected: Bool = false
-    var isDisabled: Bool = false
-    var title: String = "Title"
-    var errorMessage: String = "Minimum %@ characters are required"
-    var minCharacterLimit: Int = 3
+    var errorMessage: String = "Minimum 3 characters are required"
     var shouldShowValidationMessage: Bool = false
     var isValidText: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(title)
+            Text("Title")
                 .font(.body2())
                 .foregroundColor(disableText)
                 .tracking(-0.4)
@@ -137,7 +135,6 @@ struct FeedbackTitleFieldView: View {
             TextField("", text: $titleText)
                 .font(.subTitle1())
                 .foregroundColor(primaryText)
-                .disabled(isDisabled)
                 .tint(primaryColor)
                 .lineLimit(1)
                 .disableAutocorrection(true)
@@ -149,7 +146,7 @@ struct FeedbackTitleFieldView: View {
 
             VSpacer(3)
 
-            Text(shouldShowValidationMessage ? (isValidText ? " " : String(format: errorMessage, "\(minCharacterLimit)")) : " ")
+            Text(shouldShowValidationMessage ? (isValidText ? " " : errorMessage) : " ")
                 .foregroundColor(errorColor)
                 .font(.body1(12))
                 .minimumScaleFactor(0.5)
@@ -168,20 +165,13 @@ struct FeedbackTitleFieldView: View {
 
 struct FeedbackDescriptionView: View {
 
-    var title: String = "Description"
-    var height: CGFloat
     var isSelected: Bool = false
-    var isDisabled: Bool = false
-    var isValidText: Bool = false
-    var shouldShowValidationMessage: Bool = false
-    var errorMessage: String = ""
-    var minCharacterLimit: Int = 3
 
     @Binding var titleText: String
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(title)
+            Text("Description")
                 .font(.body2())
                 .foregroundColor(disableText)
                 .tracking(-0.4)
@@ -196,7 +186,6 @@ struct FeedbackDescriptionView: View {
                 .tint(primaryColor)
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.sentences)
-                .disabled(isDisabled)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
                 .padding(4)
@@ -204,12 +193,6 @@ struct FeedbackDescriptionView: View {
                     RoundedRectangle(cornerRadius: 7)
                         .stroke(isSelected ? primaryColor : outlineColor, lineWidth: 1)
                 )
-
-            Text(shouldShowValidationMessage ? (isValidText ? " " :  String(format: errorMessage, "\(minCharacterLimit)")) : " ")
-                .foregroundColor(errorColor)
-                .font(.body1(12))
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
         }
     }
 }
@@ -261,9 +244,11 @@ struct FeedbackAttachImageView: View {
 }
 
 struct AttachmentCellView: View {
+
     let attachment: Attachment
     let isUploading: Bool
     let shouldShowRetryButton: Bool
+
     let onRetryButtonTap: (Attachment) -> Void
     let onRemoveAttachmentTap: (Attachment) -> Void
 
@@ -271,7 +256,8 @@ struct AttachmentCellView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            AttachmentThumbnailView(attachment: attachment, isUploading: isUploading, shouldShowRetryButton: shouldShowRetryButton, onRetryButtonTap: onRetryButtonTap)
+            AttachmentThumbnailView(attachment: attachment, isUploading: isUploading,
+                                    shouldShowRetryButton: shouldShowRetryButton, onRetryButtonTap: onRetryButtonTap)
 
             Text(attachment.name)
                 .font(.body1())
@@ -307,32 +293,33 @@ struct AttachmentThumbnailView: View {
                     .resizable()
                     .frame(width: 50, height: 50, alignment: .leading)
                     .scaledToFit()
+                    .cornerRadius(12)
             } else if let video = attachment.video {
                 VideoPlayer(player: AVPlayer(url: video))
                     .frame(width: 50, height: 50)
+                    .cornerRadius(12)
             }
 
             Rectangle()
                 .frame(width: 50, height: 50, alignment: .leading)
-                .foregroundColor(isUploading || shouldShowRetryButton ? secondaryText : .clear)
+                .foregroundColor(isUploading || shouldShowRetryButton ? disableText : .clear)
+                .cornerRadius(12)
 
             if (attachment.video != nil) && !isUploading {
                 ZStack {
                     Rectangle()
                         .frame(width: 50, height: 50, alignment: .leading)
                         .foregroundColor(secondaryText)
+                        .cornerRadius(12)
 
                     Image(systemName: "play.circle")
                         .frame(width: 20, height: 20)
-                        .foregroundColor(surfaceColor)
+                        .foregroundColor(primaryColor)
                 }
             }
 
             if isUploading {
-                ProgressView()
-                    .controlSize(.small)
-                    .scaleEffect(anchor: .center)
-                    .progressViewStyle(CircularProgressViewStyle(tint: secondaryText))
+                ImageLoaderView(tintColor: primaryColor)
             }
 
             if shouldShowRetryButton {
@@ -341,8 +328,93 @@ struct AttachmentThumbnailView: View {
                 } label: {
                     Image(systemName: "arrow.clockwise.circle.fill")
                         .frame(width: 20, height: 20)
-                        .foregroundColor(surfaceColor)
+                        .foregroundColor(primaryColor)
                 }
+            }
+        }
+    }
+}
+
+public struct MultipleImageSelectionPickerView: UIViewControllerRepresentable {
+    let onDismiss: ([Attachment]) -> Void
+
+    @Binding var isPresented: Bool
+
+    public init(onDismiss: @escaping ([Attachment]) -> Void, isPresented: Binding<Bool>) {
+        self.onDismiss = onDismiss
+        self._isPresented = isPresented
+    }
+
+    public func makeUIViewController(context: Context) -> PHPickerViewController {
+        var configuration = PHPickerConfiguration()
+        configuration.selectionLimit = 10
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = context.coordinator
+        return picker
+    }
+
+    public func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {
+        // Nothing to update here
+    }
+
+    public func makeCoordinator() -> MultipleImageSelectionPickerViewCoordinator {
+        MultipleImageSelectionPickerViewCoordinator(onDismiss: onDismiss, isPresented: $isPresented)
+    }
+
+    public class MultipleImageSelectionPickerViewCoordinator: NSObject, PHPickerViewControllerDelegate {
+        let onDismiss: ([Attachment]) -> Void
+        @Binding var isPresented: Bool
+
+        let imageManager = PHImageManager.default()
+        let imageRequestOptions = PHImageRequestOptions()
+
+        public init(onDismiss: @escaping ([Attachment]) -> Void, isPresented: Binding<Bool>) {
+            self.onDismiss = onDismiss
+            self._isPresented = isPresented
+        }
+
+        public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            imageRequestOptions.isSynchronous = true
+            var attachments: [Attachment] = []
+
+            let dispatchGroup = DispatchGroup()
+
+            for attachment in results {
+                if attachment.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                    dispatchGroup.enter()
+
+                    attachment.itemProvider.loadObject(ofClass: UIImage.self) { newImage, error in
+                        if let selectedImage = newImage as? UIImage, let fileName = attachment.itemProvider.suggestedName {
+                            let imageObject = Attachment(image: selectedImage.resizeImageIfNeededWhilePreservingAspectRatio(), name: fileName)
+                            attachments.append(imageObject)
+                        } else if let error = error {
+                            LogE("Error in loading image \(error.localizedDescription)")
+                        }
+                        dispatchGroup.leave()
+                    }
+                } else if attachment.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+                    dispatchGroup.enter()
+
+                    attachment.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { url, error in // it will return the temporary file address, so immediately retrieving video as data from the temporary url.
+                        if let url = url, let fileName = attachment.itemProvider.suggestedName {
+                            do {
+                                let data = try Data(contentsOf: url)
+                                let videoObject = Attachment(videoData: data, video: url, name: fileName)
+                                attachments.append(videoObject)
+                            } catch {
+                                LogE("Error loading data from URL: \(error.localizedDescription)")
+                            }
+                        } else if let error = error {
+                            LogE("Error in loading video: \(error.localizedDescription)")
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                self.isPresented = false
+                self.onDismiss(attachments)
             }
         }
     }

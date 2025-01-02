@@ -8,10 +8,6 @@
 import UIKit
 
 public extension UIImage {
-    var pngRepresentationData: Data? {
-        self.pngData()
-    }
-
     var jpegRepresentationData: Data? {
         self.jpegData(compressionQuality: 1.0)
     }

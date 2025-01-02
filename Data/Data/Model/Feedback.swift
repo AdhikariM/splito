@@ -60,23 +60,3 @@ public struct Attachment {
         self.name = name
     }
 }
-
-public struct AttachmentData {
-    public var data: Data
-    public var attachment: Attachment
-
-    public init(data: Data, attachment: Attachment) {
-        self.data = data
-        self.attachment = attachment
-    }
-}
-
-public struct AttachmentInfo {
-    public var id = UUID().uuidString
-    public var url: String
-
-    public init(id: String = UUID().uuidString, url: String) {
-        self.id = id
-        self.url = url
-    }
-}

@@ -22,7 +22,7 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
     @Published private var uploadedAttachmentIDs: Set<String> = Set<String>()
 
     @Published var failedAttachments: [Attachment] = []
-    @Published var attachmentsUrls: [AttachmentInfo] = []
+    @Published var attachmentsUrls: [(id: String, url: String)] = []
     @Published var selectedAttachments: [Attachment] = []
     @Published var uploadingAttachments: [Attachment] = []
 
@@ -53,9 +53,8 @@ extension FeedbackViewModel {
         shouldShowValidationMessage = true
         guard isValidTitle else { return }
 
-        let attachmentUrl = attachmentsUrls.map { $0.url }
         let feedback = Feedback(title: title, description: description, userId: userId,
-                                attachmentUrls: attachmentUrl, appVersion: DeviceInfo.appVersionName,
+                                attachmentUrls: attachmentsUrls.map { $0.url }, appVersion: DeviceInfo.appVersionName,
                                 deviceName: UIDevice.current.name, deviceOsVersion: UIDevice.current.systemVersion)
         sendFeedback(feedback: feedback)
     }
@@ -68,8 +67,8 @@ extension FeedbackViewModel {
                 self?.showLoader = false
                 self?.showAlert = true
                 self?.alert = .init(message: "Thanks! your feedback has been recorded.",
-                              positiveBtnTitle: "Ok",
-                              positiveBtnAction: { [weak self] in self?.router.pop() })
+                                    positiveBtnTitle: "Ok",
+                                    positiveBtnAction: { [weak self] in self?.router.pop() })
                 LogD("FeedbackViewModel: \(#function) Feedback submitted successfully.")
             } catch {
                 self?.showLoader = false
@@ -163,10 +162,10 @@ extension FeedbackViewModel {
         if uploadedAttachmentIDs.contains(attachment.id) { return }
 
         if let imageData = attachment.image?.jpegRepresentationData {
-            upload(attachmentData: AttachmentData(data: imageData, attachment: attachment), type: .image)
+            upload(data: imageData, attachment: attachment, type: .image)
         } else if let data = attachment.videoData {
             if data.count <= VIDEO_SIZE_LIMIT_IN_BYTES {
-                upload(attachmentData: AttachmentData(data: data, attachment: attachment), type: .video)
+                upload(data: data, attachment: attachment, type: .video)
             } else {
                 selectedAttachments.removeAll { $0.id == attachment.id }
                 showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: "The video size exceeds the maximum allowed limit. Please select a smaller video."))
@@ -174,22 +173,22 @@ extension FeedbackViewModel {
         }
     }
 
-    private func upload(attachmentData: AttachmentData, type: StorageManager.AttachmentType) {
-        uploadingAttachments.append(attachmentData.attachment)
+    private func upload(data: Data, attachment: Attachment, type: StorageManager.AttachmentType) {
+        uploadingAttachments.append(attachment)
 
         Task { [weak self] in
             do {
-                let attachmentId = attachmentData.attachment.id
-                let attachmentUrl = try await self?.feedbackRepository.uploadAttachment(attachmentId: attachmentId, attachmentData: attachmentData.data, attachmentType: type)
+                let attachmentId = attachment.id
+                let attachmentUrl = try await self?.feedbackRepository.uploadAttachment(attachmentId: attachmentId, attachmentData: data, attachmentType: type)
 
                 // Update attachment URLs with the uploaded URL
                 if let attachmentUrl {
-                    self?.attachmentsUrls.append(AttachmentInfo(id: attachmentId, url: attachmentUrl))
+                    self?.attachmentsUrls.append((id: attachmentId, url: attachmentUrl))
                     self?.uploadingAttachments.removeAll { $0.id == attachmentId }
                 }
             } catch {
-                self?.failedAttachments.append(attachmentData.attachment)
-                self?.uploadingAttachments.removeAll { $0.id == attachmentData.attachment.id }
+                self?.failedAttachments.append(attachment)
+                self?.uploadingAttachments.removeAll { $0.id == attachment.id }
                 LogE("FeedbackViewModel: \(#function) Failed to upload attachment: \(error)")
             }
         }

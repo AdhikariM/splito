@@ -11,7 +11,7 @@ if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
   throw new Error('AWS credentials are not set in Firebase Functions config');
 }
 
-const REGION = 'ap-south-1'; // Set your SES region
+const REGION = 'asia-south1';
 const sesClient = new SESClient({
   credentials: {
     accessKeyId: AWS_ACCESS_KEY_ID,

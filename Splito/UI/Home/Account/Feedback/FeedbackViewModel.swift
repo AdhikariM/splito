@@ -137,6 +137,8 @@ extension FeedbackViewModel {
             showImagePicker = true
         case .removeAll:
             removeAllAttachments()
+        case .camera, .remove:
+            break
         }
     }
 
@@ -205,13 +207,6 @@ extension FeedbackViewModel {
     enum ViewState {
         case initial
         case loading
-    }
-}
-
-extension FeedbackViewModel {
-    enum ActionsOfSheet {
-        case gallery
-        case removeAll
     }
 }
 

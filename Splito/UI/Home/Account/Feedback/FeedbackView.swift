@@ -26,14 +26,14 @@ struct FeedbackView: View {
                     VSpacer(24)
 
                     VStack(spacing: 24) {
-                        FeedbackTitleFieldView(titleText: $viewModel.title, focusField: $focusField,
-                                               isSelected: focusField == .title, isValidTitle: viewModel.isValidTitle,
-                                               shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
+                        FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField,
+                                          isSelected: focusField == .title, isValidTitle: viewModel.isValidTitle,
+                                          shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
 
                         FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField,
                                                 isSelected: focusField == .description)
 
-                        FeedbackAttachImageView(
+                        FeedbackAddAttachmentView(
                             attachedImages: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
                             failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments, showImagePickerOption: $viewModel.showImagePickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
                             onRemoveAttachmentTap: viewModel.onRemoveAttachment, onRetryButtonTap: viewModel.onRetryAttachment(_:),
@@ -74,7 +74,7 @@ struct FeedbackView: View {
     }
 }
 
-struct FeedbackTitleFieldView: View {
+private struct FeedbackTitleView: View {
 
     @Binding var titleText: String
     var focusField: FocusState<FeedbackViewModel.FocusedField?>.Binding
@@ -130,7 +130,7 @@ struct FeedbackTitleFieldView: View {
     }
 }
 
-struct FeedbackDescriptionView: View {
+private struct FeedbackDescriptionView: View {
 
     @Binding var titleText: String
     var focusField: FocusState<FeedbackViewModel.FocusedField?>.Binding
@@ -167,7 +167,7 @@ struct FeedbackDescriptionView: View {
     }
 }
 
-struct FeedbackAttachImageView: View {
+private struct FeedbackAddAttachmentView: View {
 
     @Binding var attachedImages: [Attachment]
     @Binding var uploadingAttachments: [Attachment]
@@ -178,14 +178,14 @@ struct FeedbackAttachImageView: View {
     let handleAttachmentTap: () -> Void
     let onRemoveAttachmentTap: (Attachment) -> Void
     let onRetryButtonTap: (Attachment) -> Void
-    let handleActionSelection: (FeedbackViewModel.ActionsOfSheet) -> Void
+    let handleActionSelection: (ActionsOfSheet) -> Void
 
     @FocusState var focusField: FeedbackViewModel.FocusedField?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             ForEach(attachedImages, id: \.id) { attachment in
-                AttachmentCellView(
+                FeedbackAttachmentCellView(
                     attachment: attachment,
                     isUploading: uploadingAttachments.contains(where: { $0.id == attachment.id }),
                     shouldShowRetryButton: failedAttachments.contains(where: { $0.id == attachment.id }),
@@ -213,29 +213,15 @@ struct FeedbackAttachImageView: View {
             .buttonStyle(.scale)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .actionSheet(isPresented: $showImagePickerOption) {
-            getActionSheet(withRemoveAllOption: $selectedAttachments.count >= 1, selection: handleActionSelection)
+        .confirmationDialog("Choose mode\n Please choose your preferred mode to includes attachment with feedback",
+                            isPresented: $showImagePickerOption, titleVisibility: .visible) {
+            MediaPickerOptionsView(withRemoveAllOption: $selectedAttachments.count >= 1,
+                                   handleActionSelection: handleActionSelection)
         }
-    }
-
-    func getActionSheet(withRemoveAllOption: Bool, selection: @escaping ((FeedbackViewModel.ActionsOfSheet) -> Void)) -> ActionSheet {
-        let gallery: ActionSheet.Button = .default(
-            Text("Gallery")) {
-                selection(.gallery)
-            }
-        let removeAll: ActionSheet.Button = .destructive(
-            Text("Remove All")) {
-                selection(.removeAll)
-            }
-        let btn_cancel: ActionSheet.Button = .cancel(Text("Cancel"))
-
-        return ActionSheet(title: Text("Choose mode"),
-                           message: Text("Please choose your preferred mode to attach image with feedback"),
-                           buttons: withRemoveAllOption ? [gallery, removeAll, btn_cancel] : [gallery, btn_cancel])
     }
 }
 
-struct AttachmentCellView: View {
+private struct FeedbackAttachmentCellView: View {
 
     let attachment: Attachment
     let isUploading: Bool
@@ -270,7 +256,7 @@ struct AttachmentCellView: View {
     }
 }
 
-struct AttachmentThumbnailView: View {
+private struct AttachmentThumbnailView: View {
 
     let attachment: Attachment
     let isUploading: Bool

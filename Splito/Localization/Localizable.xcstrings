@@ -277,10 +277,7 @@
     "Choose date" : {
       "extractionState" : "manual"
     },
-    "Choose from Library" : {
-
-    },
-    "Choose mode" : {
+    "Choose mode\n Please choose your preferred mode to includes attachment with feedback" : {
 
     },
     "Contact Support" : {
@@ -404,9 +401,6 @@
       "extractionState" : "manual"
     },
     "Forgot password?" : {
-
-    },
-    "Gallery" : {
 
     },
     "get back" : {
@@ -628,9 +622,6 @@
     "Phone Number" : {
       "extractionState" : "manual"
     },
-    "Please choose your preferred mode to attach image with feedback" : {
-
-    },
     "Please enter a cost for your expense first!" : {
       "extractionState" : "manual"
     },
@@ -669,12 +660,6 @@
     },
     "recorded a payment from" : {
       "extractionState" : "manual"
-    },
-    "Remove" : {
-
-    },
-    "Remove All" : {
-
     },
     "Remove from group" : {
 
@@ -810,9 +795,6 @@
     },
     "Success" : {
       "extractionState" : "manual"
-    },
-    "Take a picture" : {
-
     },
     "The amounts do not add up to the total cost of %@. You are %@ by %@." : {
       "extractionState" : "manual"

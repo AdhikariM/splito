@@ -42,7 +42,7 @@ struct FeedbackView: View {
 
                         PrimaryButton(
                             text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
-                            showLoader: viewModel.showLoader, onClick: viewModel.submitFeedback
+                            showLoader: viewModel.showLoader, onClick: viewModel.onSubmitBtnTap
                         )
                     }
                     .padding([.horizontal, .bottom], 16)
@@ -69,7 +69,7 @@ struct FeedbackView: View {
         }
         .sheet(isPresented: $viewModel.showMediaPicker) {
             MultiMediaSelectionPickerView(isPresented: $viewModel.showMediaPicker,
-                                             onDismiss: viewModel.onMediaPickerSheetDismiss(attachments:))
+                                          onDismiss: viewModel.onMediaPickerSheetDismiss(attachments:))
         }
     }
 }

@@ -23,7 +23,7 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
 
     public func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 10
+        configuration.selectionLimit = 5
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
         picker.view.tintColor = UIColor(infoColor)
@@ -67,7 +67,7 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
                             let imageObject = Attachment(image: selectedImage.resizeImageIfNeededWhilePreservingAspectRatio(), name: fileName)
                             attachments.append(imageObject)
                         } else if let error = error {
-                            LogE("MultipleMediaSelectionPickerCoordinator: \(#function) Error in loading image: \(error)")
+                            LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading image: \(error)")
                         }
                         dispatchGroup.leave()
                     }
@@ -81,10 +81,10 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
                                 let videoObject = Attachment(videoData: data, video: url, name: fileName)
                                 attachments.append(videoObject)
                             } catch {
-                                LogE("MultipleMediaSelectionPickerCoordinator: \(#function) Error loading data from URL: \(error.localizedDescription)")
+                                LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error loading data from URL: \(error)")
                             }
                         } else if let error = error {
-                            LogE("MultipleMediaSelectionPickerCoordinator: \(#function) Error in loading video: \(error)")
+                            LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading video: \(error)")
                         }
                         dispatchGroup.leave()
                     }

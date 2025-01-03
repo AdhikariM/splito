@@ -18,7 +18,6 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
     @Inject private var feedbackRepository: FeedbackRepository
 
     @Published var description: String = ""
-    @Published private(set) var currentState: ViewState = .initial
     @Published private var uploadedAttachmentIDs: Set<String> = Set<String>()
 
     @Published var failedAttachments: [Attachment] = []
@@ -145,14 +144,14 @@ extension FeedbackViewModel {
     }
 
     private func removeAttachmentFromArrays(attachmentId: String, removeAllSelected: Bool = false) {
-        withAnimation {
-            attachmentsUrls.removeAll { $0.id == attachmentId }
-            selectedAttachments.removeAll { $0.id == attachmentId }
-            uploadingAttachments.removeAll { $0.id == attachmentId }
-            
+        withAnimation { [weak self] in
+            self?.attachmentsUrls.removeAll { $0.id == attachmentId }
+            self?.selectedAttachments.removeAll { $0.id == attachmentId }
+            self?.uploadingAttachments.removeAll { $0.id == attachmentId }
+
             if removeAllSelected {
-                failedAttachments.removeAll { $0.id == attachmentId }
-                uploadedAttachmentIDs.remove(attachmentId)
+                self?.failedAttachments.removeAll { $0.id == attachmentId }
+                self?.uploadedAttachmentIDs.remove(attachmentId)
             }
         }
     }
@@ -169,7 +168,7 @@ extension FeedbackViewModel {
 
     private func validateAndUploadAttachment(data: Data, attachment: Attachment, maxSize: Int, type: StorageManager.AttachmentType) {
         if data.count <= maxSize {
-            upload(data: data, attachment: attachment, type: type)
+            uploadAttachment(data: data, attachment: attachment, type: type)
         } else {
             selectedAttachments.removeAll { $0.id == attachment.id }
             let message = type == .image ? "The image size exceeds the maximum allowed limit. Please select a smaller image."
@@ -178,7 +177,7 @@ extension FeedbackViewModel {
         }
     }
 
-    private func upload(data: Data, attachment: Attachment, type: StorageManager.AttachmentType) {
+    private func uploadAttachment(data: Data, attachment: Attachment, type: StorageManager.AttachmentType) {
         uploadingAttachments.append(attachment)
 
         Task { [weak self] in
@@ -190,7 +189,7 @@ extension FeedbackViewModel {
                     self?.attachmentsUrls.append((id: attachmentId, url: attachmentUrl))
                     self?.uploadingAttachments.removeAll { $0.id == attachmentId }
                 }
-                LogE("FeedbackViewModel: \(#function) Attachment uploaded successfully.")
+                LogD("FeedbackViewModel: \(#function) Attachment uploaded successfully.")
             } catch {
                 self?.failedAttachments.append(attachment)
                 self?.uploadingAttachments.removeAll { $0.id == attachment.id }
@@ -206,14 +205,6 @@ extension FeedbackViewModel {
         } else {
             showToastForError()
         }
-    }
-}
-
-// MARK: - View's State
-extension FeedbackViewModel {
-    enum ViewState {
-        case initial
-        case loading
     }
 }
 

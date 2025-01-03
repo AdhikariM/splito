@@ -18,35 +18,31 @@ struct FeedbackView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if case .loading = viewModel.currentState {
-                LoaderView()
-            } else {
-                ScrollView(showsIndicators: false) {
-                    VSpacer(24)
+            ScrollView(showsIndicators: false) {
+                VSpacer(24)
 
-                    VStack(spacing: 24) {
-                        FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField,
-                                          isSelected: focusField == .title, isValidTitle: viewModel.isValidTitle,
-                                          shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
+                VStack(spacing: 24) {
+                    FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField,
+                                      isSelected: focusField == .title, isValidTitle: viewModel.isValidTitle,
+                                      shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
 
-                        FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField,
-                                                isSelected: focusField == .description)
+                    FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField,
+                                            isSelected: focusField == .description)
 
-                        FeedbackAddAttachmentView(
-                            attachedMedia: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
-                            failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments,
-                            showMediaPickerOption: $viewModel.showMediaPickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
-                            onRemoveAttachmentTap: viewModel.onRemoveAttachment, onRetryButtonTap: viewModel.onRetryAttachment(_:),
-                            handleActionSelection: viewModel.handleActionSelection(_:), focusField: _focusField
-                        )
+                    FeedbackAddAttachmentView(
+                        attachedMedia: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
+                        failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments,
+                        showMediaPickerOption: $viewModel.showMediaPickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
+                        onRemoveAttachmentTap: viewModel.onRemoveAttachment, onRetryButtonTap: viewModel.onRetryAttachment(_:),
+                        handleActionSelection: viewModel.handleActionSelection(_:), focusField: _focusField
+                    )
 
-                        PrimaryButton(
-                            text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
-                            showLoader: viewModel.showLoader, onClick: viewModel.onSubmitBtnTap
-                        )
-                    }
-                    .padding([.horizontal, .bottom], 16)
+                    PrimaryButton(
+                        text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
+                        showLoader: viewModel.showLoader, onClick: viewModel.onSubmitBtnTap
+                    )
                 }
+                .padding([.horizontal, .bottom], 16)
             }
         }
         .frame(maxWidth: isIpad ? 600 : nil, alignment: .center)

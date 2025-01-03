@@ -5,7 +5,7 @@
 //  Created by Nirali Sonani on 02/01/25.
 //
 
-import SwiftUI
+import UIKit
 
 public class DeviceInfo {
 
@@ -26,6 +26,6 @@ public class DeviceInfo {
     }
 
     public static var appVersionName: String {
-        return Bundle.main.infoDictionary!["CFBundleShortVersionString"] as? String ?? ""
+        return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     }
 }

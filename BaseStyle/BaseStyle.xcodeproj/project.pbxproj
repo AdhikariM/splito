@@ -28,7 +28,6 @@
 		D8302D9C2B9EE1D2005ACA13 /* PrimaryFloatingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8302D9B2B9EE1D2005ACA13 /* PrimaryFloatingButton.swift */; };
 		D887213F2B99992A009DC5BE /* LoaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D887213E2B99992A009DC5BE /* LoaderViewModel.swift */; };
 		D89C933F2BC3C0F800FACD16 /* ForwardIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89C933E2BC3C0F800FACD16 /* ForwardIcon.swift */; };
-		D89C93462BC42DE500FACD16 /* MailComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89C93452BC42DE500FACD16 /* MailComposeView.swift */; };
 		D89DBE332B888F2D00E5F1BD /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89DBE322B888F2D00E5F1BD /* SearchBar.swift */; };
 		D89DBE352B88A05F00E5F1BD /* UIApplication+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89DBE342B88A05F00E5F1BD /* UIApplication+Extension.swift */; };
 		D89DBE3E2B8C67CE00E5F1BD /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89DBE3D2B8C67CE00E5F1BD /* String+Extension.swift */; };
@@ -92,7 +91,6 @@
 		D8302D9B2B9EE1D2005ACA13 /* PrimaryFloatingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryFloatingButton.swift; sourceTree = "<group>"; };
 		D887213E2B99992A009DC5BE /* LoaderViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoaderViewModel.swift; path = BaseStyle/Views/LoaderViewModel.swift; sourceTree = SOURCE_ROOT; };
 		D89C933E2BC3C0F800FACD16 /* ForwardIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForwardIcon.swift; sourceTree = "<group>"; };
-		D89C93452BC42DE500FACD16 /* MailComposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailComposeView.swift; sourceTree = "<group>"; };
 		D89DBE322B888F2D00E5F1BD /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		D89DBE342B88A05F00E5F1BD /* UIApplication+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extension.swift"; sourceTree = "<group>"; };
 		D89DBE3D2B8C67CE00E5F1BD /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
@@ -305,7 +303,6 @@
 				D89DBE322B888F2D00E5F1BD /* SearchBar.swift */,
 				D8D42AAF2B872E44009B345D /* LoaderView.swift */,
 				D8D14A4F2BA090F000F45FF2 /* ShareSheetView.swift */,
-				D89C93452BC42DE500FACD16 /* MailComposeView.swift */,
 				D82174BD2BBAD86D00DB42C3 /* ProfileImageView.swift */,
 				D8E244C02B986CD800C6C82A /* ImagePickerView.swift */,
 				2163D3B72D27B2FD004B4F20 /* MediaPickerOptionsView.swift */,
@@ -520,7 +517,6 @@
 				D8EB5E952CF8B12B005B68D9 /* ZoomableImageView.swift in Sources */,
 				D8D42A952B85F8A2009B345D /* Bundle+Extension.swift in Sources */,
 				21D26E232CA199630090488B /* CapsuleButton.swift in Sources */,
-				D89C93462BC42DE500FACD16 /* MailComposeView.swift in Sources */,
 				213A1F2A2C52335D00BF9800 /* CheckmarkButton.swift in Sources */,
 				D8E244C12B986CD800C6C82A /* ImagePickerView.swift in Sources */,
 				D8D42A862B85D08F009B345D /* Font+Extension.swift in Sources */,

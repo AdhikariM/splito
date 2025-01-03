@@ -110,7 +110,7 @@ extension FeedbackViewModel {
                 withAnimation {
                     self.attachmentsUrls.remove(at: urlIndex)
                     self.selectedAttachments.remove(at: index)
-                    self.uploadingAttachments.removeAll { $0.id == self.selectedAttachments[index].id }
+                    self.uploadingAttachments.removeAll(where: { $0.id == attachment.id })
                 }
                 LogD("FeedbackViewModel: \(#function) Attachment deleted successfully.")
             } catch {

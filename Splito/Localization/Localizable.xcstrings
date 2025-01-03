@@ -283,9 +283,6 @@
     "Contact Support" : {
       "extractionState" : "manual"
     },
-    "Contact Us" : {
-      "extractionState" : "manual"
-    },
     "Continue your journey" : {
       "extractionState" : "manual"
     },
@@ -335,9 +332,6 @@
       "extractionState" : "manual"
     },
     "Email sent" : {
-      "extractionState" : "manual"
-    },
-    "Email sent successfully!" : {
       "extractionState" : "manual"
     },
     "Enter a description" : {
@@ -793,6 +787,9 @@
     "Stay In Touch" : {
 
     },
+    "Submit" : {
+      "extractionState" : "manual"
+    },
     "Success" : {
       "extractionState" : "manual"
     },
@@ -1020,9 +1017,6 @@
     },
     "Your %@ spending" : {
 
-    },
-    "Your device cannot send email." : {
-      "extractionState" : "manual"
     },
     "Your first name must be at least 3 characters long." : {
       "extractionState" : "manual"

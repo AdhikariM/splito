@@ -25,8 +25,8 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
     @Published var selectedAttachments: [Attachment] = []
     @Published var uploadingAttachments: [Attachment] = []
 
-    @Published var showImagePicker: Bool = false
-    @Published var showImagePickerOption: Bool = false
+    @Published var showMediaPicker: Bool = false
+    @Published var showMediaPickerOption: Bool = false
     @Published private(set) var showLoader: Bool = false
     @Published private(set) var isValidTitle: Bool = false
     @Published private(set) var shouldShowValidationMessage: Bool = false
@@ -79,7 +79,7 @@ extension FeedbackViewModel {
         }
     }
 
-    func onImagePickerSheetDismiss(attachments: [Attachment]) {
+    func onMediaPickerSheetDismiss(attachments: [Attachment]) {
         for attachment in attachments {
             selectedAttachments.append(attachment)
             upload(attachment: attachment)
@@ -88,9 +88,9 @@ extension FeedbackViewModel {
 
     func handleAttachmentTap() {
         if selectedAttachments.isEmpty {
-            showImagePicker = true
+            showMediaPicker = true
         } else {
-            showImagePickerOption = true
+            showMediaPickerOption = true
         }
     }
 
@@ -134,7 +134,7 @@ extension FeedbackViewModel {
     func handleActionSelection(_ action: ActionsOfSheet) {
         switch action {
         case .gallery:
-            showImagePicker = true
+            showMediaPicker = true
         case .removeAll:
             removeAllAttachments()
         case .camera, .remove:

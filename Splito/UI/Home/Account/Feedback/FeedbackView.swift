@@ -34,8 +34,9 @@ struct FeedbackView: View {
                                                 isSelected: focusField == .description)
 
                         FeedbackAddAttachmentView(
-                            attachedImages: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
-                            failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments, showImagePickerOption: $viewModel.showImagePickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
+                            attachedMedia: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
+                            failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments,
+                            showMediaPickerOption: $viewModel.showMediaPickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
                             onRemoveAttachmentTap: viewModel.onRemoveAttachment, onRetryButtonTap: viewModel.onRetryAttachment(_:),
                             handleActionSelection: viewModel.handleActionSelection(_:), focusField: _focusField
                         )
@@ -67,9 +68,9 @@ struct FeedbackView: View {
         .onTapGesture {
             UIApplication.shared.endEditing()
         }
-        .sheet(isPresented: $viewModel.showImagePicker) {
-            MultipleImageSelectionPickerView(onDismiss: viewModel.onImagePickerSheetDismiss(attachments:),
-                                             isPresented: $viewModel.showImagePicker)
+        .sheet(isPresented: $viewModel.showMediaPicker) {
+            MultipleMediaSelectionPickerView(isPresented: $viewModel.showMediaPicker,
+                                             onDismiss: viewModel.onMediaPickerSheetDismiss(attachments:))
         }
     }
 }
@@ -96,16 +97,11 @@ private struct FeedbackTitleView: View {
             TextField("", text: $titleText)
                 .font(.subTitle1())
                 .foregroundColor(primaryText)
+                .focused(focusField, equals: .title)
                 .tint(primaryColor)
-                .lineLimit(1)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.sentences)
                 .padding(8)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 7)
-                        .stroke(shouldShowValidationMessage && !isValidTitle ? errorColor : isSelected ? primaryColor : outlineColor, lineWidth: 1)
-                )
-                .focused(focusField, equals: .title)
                 .submitLabel(.next)
                 .onSubmit {
                     if focusField.wrappedValue == .title {
@@ -117,6 +113,11 @@ private struct FeedbackTitleView: View {
                 .onTapGestureForced {
                     focusField.wrappedValue = .title
                 }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7)
+                        .stroke(shouldShowValidationMessage && !isValidTitle ? errorColor :
+                                    isSelected ? primaryColor : outlineColor, lineWidth: 1)
+                )
 
             VSpacer(3)
 
@@ -149,31 +150,31 @@ private struct FeedbackDescriptionView: View {
                 .frame(height: UIScreen.main.bounds.height/4, alignment: .center)
                 .font(.subTitle2())
                 .foregroundStyle(primaryText)
+                .focused(focusField, equals: .description)
                 .tint(primaryColor)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.sentences)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
                 .padding(4)
+                .onTapGestureForced {
+                    focusField.wrappedValue = .description
+                }
                 .overlay(
                     RoundedRectangle(cornerRadius: 7)
                         .stroke(isSelected ? primaryColor : outlineColor, lineWidth: 1)
                 )
-                .focused(focusField, equals: .description)
-                .onTapGestureForced {
-                    focusField.wrappedValue = .description
-                }
         }
     }
 }
 
 private struct FeedbackAddAttachmentView: View {
 
-    @Binding var attachedImages: [Attachment]
+    @Binding var attachedMedia: [Attachment]
     @Binding var uploadingAttachments: [Attachment]
     @Binding var failedAttachments: [Attachment]
     @Binding var selectedAttachments: [Attachment]
-    @Binding var showImagePickerOption: Bool
+    @Binding var showMediaPickerOption: Bool
 
     let handleAttachmentTap: () -> Void
     let onRemoveAttachmentTap: (Attachment) -> Void
@@ -184,11 +185,11 @@ private struct FeedbackAddAttachmentView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            ForEach(attachedImages, id: \.id) { attachment in
+            ForEach(attachedMedia, id: \.id) { attachment in
                 FeedbackAttachmentCellView(
                     attachment: attachment,
                     isUploading: uploadingAttachments.contains(where: { $0.id == attachment.id }),
-                    shouldShowRetryButton: failedAttachments.contains(where: { $0.id == attachment.id }),
+                    showRetryButton: failedAttachments.contains(where: { $0.id == attachment.id }),
                     onRetryButtonTap: {_ in
                         onRetryButtonTap(attachment)
                     },
@@ -213,8 +214,8 @@ private struct FeedbackAddAttachmentView: View {
             .buttonStyle(.scale)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .confirmationDialog("Choose mode\n Please choose your preferred mode to includes attachment with feedback",
-                            isPresented: $showImagePickerOption, titleVisibility: .visible) {
+        .confirmationDialog("Choose mode\nPlease choose your preferred mode to includes attachment with feedback",
+                            isPresented: $showMediaPickerOption, titleVisibility: .visible) {
             MediaPickerOptionsView(withRemoveAllOption: $selectedAttachments.count >= 1,
                                    handleActionSelection: handleActionSelection)
         }
@@ -225,7 +226,7 @@ private struct FeedbackAttachmentCellView: View {
 
     let attachment: Attachment
     let isUploading: Bool
-    let shouldShowRetryButton: Bool
+    let showRetryButton: Bool
 
     let onRetryButtonTap: (Attachment) -> Void
     let onRemoveAttachmentTap: (Attachment) -> Void
@@ -235,7 +236,7 @@ private struct FeedbackAttachmentCellView: View {
     var body: some View {
         HStack(spacing: 0) {
             AttachmentThumbnailView(attachment: attachment, isUploading: isUploading,
-                                    shouldShowRetryButton: shouldShowRetryButton, onRetryButtonTap: onRetryButtonTap)
+                                    showRetryButton: showRetryButton, onRetryButtonTap: onRetryButtonTap)
 
             Text(attachment.name)
                 .font(.body1())
@@ -246,10 +247,10 @@ private struct FeedbackAttachmentCellView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .overlay(alignment: .trailing) {
-            DismissButton(iconSize: (20, .regular), onDismissAction: {
+            DismissButton(iconName: "multiply.circle.fill", iconSize: (20, .regular)) {
                 focusField = nil
                 onRemoveAttachmentTap(attachment)
-            })
+            }
             .padding([.vertical, .leading])
             .background(.linearGradient(.init(colors: [surfaceColor, surfaceColor, surfaceColor, surfaceColor, surfaceColor.opacity(0)]), startPoint: .trailing, endPoint: .leading))
         }
@@ -260,7 +261,7 @@ private struct AttachmentThumbnailView: View {
 
     let attachment: Attachment
     let isUploading: Bool
-    let shouldShowRetryButton: Bool
+    let showRetryButton: Bool
 
     let onRetryButtonTap: (Attachment) -> Void
 
@@ -269,59 +270,49 @@ private struct AttachmentThumbnailView: View {
             if let image = attachment.image {
                 Image(uiImage: image)
                     .resizable()
-                    .frame(width: 50, height: 50, alignment: .leading)
-                    .scaledToFit()
-                    .cornerRadius(12)
+                    .scaledToFill()
             } else if let video = attachment.video {
                 VideoPlayer(player: AVPlayer(url: video))
-                    .frame(width: 50, height: 50)
-                    .cornerRadius(12)
             }
 
             Rectangle()
                 .frame(width: 50, height: 50, alignment: .leading)
-                .foregroundColor(isUploading || shouldShowRetryButton ? disableText : .clear)
-                .cornerRadius(12)
+                .foregroundColor(isUploading || showRetryButton ? lowestText : .clear)
 
-            if (attachment.video != nil) && !isUploading {
-                ZStack {
-                    Rectangle()
-                        .frame(width: 50, height: 50, alignment: .leading)
-                        .foregroundColor(secondaryText)
-                        .cornerRadius(12)
-
-                    Image(systemName: "play.circle")
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(primaryColor)
-                }
+            if attachment.video != nil && !isUploading {
+                Image(systemName: "play.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(primaryColor)
             }
 
             if isUploading {
-                ImageLoaderView(tintColor: primaryColor)
+                ImageLoaderView(tintColor: primaryText)
             }
 
-            if shouldShowRetryButton {
+            if showRetryButton {
                 Button {
                     onRetryButtonTap(attachment)
                 } label: {
                     Image(systemName: "arrow.clockwise.circle.fill")
-                        .frame(width: 20, height: 20)
+                        .font(.system(size: 20))
                         .foregroundColor(primaryColor)
                 }
             }
         }
+        .frame(width: 50, height: 50, alignment: .center)
+        .cornerRadius(12)
     }
 }
 
-public struct MultipleImageSelectionPickerView: UIViewControllerRepresentable {
-
-    let onDismiss: ([Attachment]) -> Void
+public struct MultipleMediaSelectionPickerView: UIViewControllerRepresentable {
 
     @Binding var isPresented: Bool
 
-    public init(onDismiss: @escaping ([Attachment]) -> Void, isPresented: Binding<Bool>) {
-        self.onDismiss = onDismiss
+    let onDismiss: ([Attachment]) -> Void
+
+    public init(isPresented: Binding<Bool>, onDismiss: @escaping ([Attachment]) -> Void) {
         self._isPresented = isPresented
+        self.onDismiss = onDismiss
     }
 
     public func makeUIViewController(context: Context) -> PHPickerViewController {
@@ -329,6 +320,7 @@ public struct MultipleImageSelectionPickerView: UIViewControllerRepresentable {
         configuration.selectionLimit = 10
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
+        picker.view.tintColor = UIColor(infoColor)
         return picker
     }
 
@@ -336,20 +328,22 @@ public struct MultipleImageSelectionPickerView: UIViewControllerRepresentable {
         // Nothing to update here
     }
 
-    public func makeCoordinator() -> MultipleImageSelectionPickerViewCoordinator {
-        MultipleImageSelectionPickerViewCoordinator(onDismiss: onDismiss, isPresented: $isPresented)
+    public func makeCoordinator() -> MultipleMediaSelectionPickerCoordinator {
+        MultipleMediaSelectionPickerCoordinator(isPresented: $isPresented, onDismiss: onDismiss)
     }
 
-    public class MultipleImageSelectionPickerViewCoordinator: NSObject, PHPickerViewControllerDelegate {
-        let onDismiss: ([Attachment]) -> Void
+    public class MultipleMediaSelectionPickerCoordinator: NSObject, PHPickerViewControllerDelegate {
+
         @Binding var isPresented: Bool
+
+        let onDismiss: ([Attachment]) -> Void
 
         let imageManager = PHImageManager.default()
         let imageRequestOptions = PHImageRequestOptions()
 
-        public init(onDismiss: @escaping ([Attachment]) -> Void, isPresented: Binding<Bool>) {
-            self.onDismiss = onDismiss
+        public init(isPresented: Binding<Bool>, onDismiss: @escaping ([Attachment]) -> Void) {
             self._isPresented = isPresented
+            self.onDismiss = onDismiss
         }
 
         public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {

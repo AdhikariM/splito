@@ -26,47 +26,24 @@ struct FeedbackView: View {
                     VSpacer(24)
 
                     VStack(spacing: 24) {
-                        FeedbackTitleFieldView(
-                            titleText: $viewModel.title,
-                            isSelected: focusField == .title,
-                            shouldShowValidationMessage: viewModel.shouldShowValidationMessage,
-                            isValidText: viewModel.isValidTitle)
-                        .focused($focusField, equals: .title)
-                        .submitLabel(.next)
-                        .onSubmit {
-                            if focusField == .title {
-                                focusField = .description
-                            } else if focusField == .description {
-                                focusField = nil
-                            }
-                        }
-                        .onTapGestureForced {
-                            focusField = .title
-                        }
+                        FeedbackTitleFieldView(titleText: $viewModel.title, focusField: $focusField,
+                                               isSelected: focusField == .title, isValidTitle: viewModel.isValidTitle,
+                                               shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
 
-                        FeedbackDescriptionView(
-                            isSelected: focusField == .description,
-                            titleText: $viewModel.description)
-                        .focused($focusField, equals: .description)
-                        .onTapGestureForced {
-                            focusField = .description
-                        }
+                        FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField,
+                                                isSelected: focusField == .description)
 
-                        FeedbackAttachImageView(attachedImages: $viewModel.selectedAttachments,
-                                                uploadingAttachments: $viewModel.uploadingAttachments,
-                                                failedAttachments: $viewModel.failedAttachments,
-                                                handleAttachmentTap: viewModel.handleAttachmentTap,
-                                                onRemoveAttachmentTap: viewModel.onRemoveAttachment,
-                                                onRetryButtonTap: viewModel.onRetryAttachment(_:),
-                                                focusField: _focusField)
-                        .actionSheet(isPresented: $viewModel.showImagePickerOption, content: {
-                            getActionSheet(withRemoveAllOption: $viewModel.selectedAttachments.count >= 1,
-                                           selection: viewModel.handleActionSelection(_:))
-                        })
+                        FeedbackAttachImageView(
+                            attachedImages: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
+                            failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments, showImagePickerOption: $viewModel.showImagePickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
+                            onRemoveAttachmentTap: viewModel.onRemoveAttachment, onRetryButtonTap: viewModel.onRetryAttachment(_:),
+                            handleActionSelection: viewModel.handleActionSelection(_:), focusField: _focusField
+                        )
 
-                        PrimaryButton(text: "Submit",
-                                      isEnabled: viewModel.isValidTitle && viewModel.uploadingAttachments.isEmpty,
-                                      showLoader: viewModel.showLoader, onClick: viewModel.submitFeedback)
+                        PrimaryButton(
+                            text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
+                            showLoader: viewModel.showLoader, onClick: viewModel.submitFeedback
+                        )
                     }
                     .padding([.horizontal, .bottom], 16)
                 }
@@ -77,15 +54,15 @@ struct FeedbackView: View {
         .background(surfaceColor)
         .alertView.alert(isPresented: $viewModel.showAlert, alertStruct: viewModel.alert)
         .toastView(toast: $viewModel.toast)
+        .onAppear {
+            focusField = .title
+            UIScrollView.appearance().keyboardDismissMode = .interactive
+        }
         .toolbarRole(.editor)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 NavigationTitleTextView(text: "Contact support")
             }
-        }
-        .onAppear {
-            UIScrollView.appearance().keyboardDismissMode = .interactive
-            focusField = .title
         }
         .onTapGesture {
             UIApplication.shared.endEditing()
@@ -95,32 +72,16 @@ struct FeedbackView: View {
                                              isPresented: $viewModel.showImagePicker)
         }
     }
-
-    func getActionSheet(withRemoveAllOption: Bool, selection: @escaping ((FeedbackViewModel.ActionsOfSheet) -> Void)) -> ActionSheet {
-        let gallery: ActionSheet.Button = .default(
-            Text("Gallery")) {
-                selection(.gallery)
-            }
-        let removeAll: ActionSheet.Button = .destructive(
-            Text("Remove All")) {
-                selection(.removeAll)
-            }
-        let btn_cancel: ActionSheet.Button = .cancel(Text("Cancel"))
-
-        return ActionSheet(title: Text("Choose mode"),
-                           message: Text("Please choose your preferred mode to attach image with feedback"),
-                           buttons: withRemoveAllOption ? [gallery, removeAll, btn_cancel] : [gallery, btn_cancel])
-    }
 }
 
 struct FeedbackTitleFieldView: View {
 
     @Binding var titleText: String
+    var focusField: FocusState<FeedbackViewModel.FocusedField?>.Binding
 
-    var isSelected: Bool = false
-    var errorMessage: String = "Minimum 3 characters are required"
-    var shouldShowValidationMessage: Bool = false
-    var isValidText: Bool = false
+    let isSelected: Bool
+    let isValidTitle: Bool
+    let shouldShowValidationMessage: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -137,54 +98,59 @@ struct FeedbackTitleFieldView: View {
                 .foregroundColor(primaryText)
                 .tint(primaryColor)
                 .lineLimit(1)
-                .disableAutocorrection(true)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.sentences)
                 .padding(8)
                 .overlay(
                     RoundedRectangle(cornerRadius: 7)
-                        .stroke(getDividerColor(), lineWidth: 1)
+                        .stroke(shouldShowValidationMessage && !isValidTitle ? errorColor : isSelected ? primaryColor : outlineColor, lineWidth: 1)
                 )
+                .focused(focusField, equals: .title)
+                .submitLabel(.next)
+                .onSubmit {
+                    if focusField.wrappedValue == .title {
+                        focusField.wrappedValue = .description
+                    } else if focusField.wrappedValue == .description {
+                        focusField.wrappedValue = nil
+                    }
+                }
+                .onTapGestureForced {
+                    focusField.wrappedValue = .title
+                }
 
             VSpacer(3)
 
-            Text(shouldShowValidationMessage ? (isValidText ? " " : errorMessage) : " ")
+            Text(shouldShowValidationMessage ? (isValidTitle ? " " : "Minimum 3 characters are required") : " ")
                 .foregroundColor(errorColor)
                 .font(.body1(12))
+                .foregroundColor(errorColor)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
-        }
-    }
-
-    func getDividerColor() -> Color {
-        if shouldShowValidationMessage && !isValidText {
-            return errorColor
-        } else {
-            return isSelected ? primaryColor : outlineColor
         }
     }
 }
 
 struct FeedbackDescriptionView: View {
 
-    var isSelected: Bool = false
-
     @Binding var titleText: String
+    var focusField: FocusState<FeedbackViewModel.FocusedField?>.Binding
+
+    let isSelected: Bool
 
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 8) {
             Text("Description")
                 .font(.body2())
                 .foregroundColor(disableText)
                 .tracking(-0.4)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            VSpacer(8)
-
             TextEditor(text: $titleText)
                 .frame(height: UIScreen.main.bounds.height/4, alignment: .center)
                 .font(.subTitle2())
                 .foregroundStyle(primaryText)
                 .tint(primaryColor)
-                .disableAutocorrection(true)
+                .autocorrectionDisabled()
                 .textInputAutocapitalization(.sentences)
                 .scrollContentBackground(.hidden)
                 .scrollIndicators(.hidden)
@@ -193,6 +159,10 @@ struct FeedbackDescriptionView: View {
                     RoundedRectangle(cornerRadius: 7)
                         .stroke(isSelected ? primaryColor : outlineColor, lineWidth: 1)
                 )
+                .focused(focusField, equals: .description)
+                .onTapGestureForced {
+                    focusField.wrappedValue = .description
+                }
         }
     }
 }
@@ -202,10 +172,13 @@ struct FeedbackAttachImageView: View {
     @Binding var attachedImages: [Attachment]
     @Binding var uploadingAttachments: [Attachment]
     @Binding var failedAttachments: [Attachment]
+    @Binding var selectedAttachments: [Attachment]
+    @Binding var showImagePickerOption: Bool
 
     let handleAttachmentTap: () -> Void
     let onRemoveAttachmentTap: (Attachment) -> Void
     let onRetryButtonTap: (Attachment) -> Void
+    let handleActionSelection: (FeedbackViewModel.ActionsOfSheet) -> Void
 
     @FocusState var focusField: FeedbackViewModel.FocusedField?
 
@@ -240,6 +213,25 @@ struct FeedbackAttachImageView: View {
             .buttonStyle(.scale)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .actionSheet(isPresented: $showImagePickerOption) {
+            getActionSheet(withRemoveAllOption: $selectedAttachments.count >= 1, selection: handleActionSelection)
+        }
+    }
+
+    func getActionSheet(withRemoveAllOption: Bool, selection: @escaping ((FeedbackViewModel.ActionsOfSheet) -> Void)) -> ActionSheet {
+        let gallery: ActionSheet.Button = .default(
+            Text("Gallery")) {
+                selection(.gallery)
+            }
+        let removeAll: ActionSheet.Button = .destructive(
+            Text("Remove All")) {
+                selection(.removeAll)
+            }
+        let btn_cancel: ActionSheet.Button = .cancel(Text("Cancel"))
+
+        return ActionSheet(title: Text("Choose mode"),
+                           message: Text("Please choose your preferred mode to attach image with feedback"),
+                           buttons: withRemoveAllOption ? [gallery, removeAll, btn_cancel] : [gallery, btn_cancel])
     }
 }
 
@@ -336,6 +328,7 @@ struct AttachmentThumbnailView: View {
 }
 
 public struct MultipleImageSelectionPickerView: UIViewControllerRepresentable {
+
     let onDismiss: ([Attachment]) -> Void
 
     @Binding var isPresented: Bool

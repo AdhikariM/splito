@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Combine
 import Data
 import BaseStyle
 
@@ -50,8 +49,10 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
 extension FeedbackViewModel {
     func submitFeedback() {
         guard let userId = preference.user?.id else { return }
-        shouldShowValidationMessage = true
-        guard isValidTitle else { return }
+        guard isValidTitle else {
+            shouldShowValidationMessage = true
+            return
+        }
 
         let feedback = Feedback(title: title, description: description, userId: userId,
                                 attachmentUrls: attachmentsUrls.map { $0.url }, appVersion: DeviceInfo.appVersionName,
@@ -106,9 +107,11 @@ extension FeedbackViewModel {
             guard let self else { return }
             do {
                 try await self.feedbackRepository.deleteAttachment(attachmentUrl: attachmentsUrls[urlIndex].url)
-                self.attachmentsUrls.remove(at: urlIndex)
-                self.selectedAttachments.remove(at: index)
-                self.uploadingAttachments.removeAll { $0.id == self.selectedAttachments[index].id }
+                withAnimation {
+                    self.attachmentsUrls.remove(at: urlIndex)
+                    self.selectedAttachments.remove(at: index)
+                    self.uploadingAttachments.removeAll { $0.id == self.selectedAttachments[index].id }
+                }
                 LogD("FeedbackViewModel: \(#function) Attachment deleted successfully.")
             } catch {
                 LogE("FeedbackViewModel: \(#function) Failed to delete attachment: \(error)")
@@ -150,11 +153,13 @@ extension FeedbackViewModel {
                 }
             }
 
-            self.selectedAttachments.removeAll()
-            self.uploadingAttachments.removeAll()
-            self.attachmentsUrls.removeAll()
-            self.failedAttachments.removeAll()
-            self.uploadedAttachmentIDs.removeAll()
+            withAnimation {
+                self.selectedAttachments.removeAll()
+                self.uploadingAttachments.removeAll()
+                self.attachmentsUrls.removeAll()
+                self.failedAttachments.removeAll()
+                self.uploadedAttachmentIDs.removeAll()
+            }
         }
     }
 

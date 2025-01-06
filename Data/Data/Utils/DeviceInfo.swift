@@ -13,16 +13,8 @@ public class DeviceInfo {
         UIDevice.current.name
     }
 
-    public static var currentOsVersion: String {
+    public static var deviceOsVersion: String {
         UIDevice.current.systemVersion
-    }
-
-    public static var buildVersion: Int {
-        if let result = Bundle.main.infoDictionary?["CFBundleVersion"] as? String {
-            return Int(result) ?? 0
-        } else {
-            return 0
-        }
     }
 
     public static var appVersionName: String {

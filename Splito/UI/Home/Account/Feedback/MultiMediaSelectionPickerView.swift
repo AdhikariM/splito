@@ -14,16 +14,18 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
 
     @Binding var isPresented: Bool
 
+    let attachmentLimit: Int
     let onDismiss: ([Attachment]) -> Void
 
-    public init(isPresented: Binding<Bool>, onDismiss: @escaping ([Attachment]) -> Void) {
+    public init(isPresented: Binding<Bool>, attachmentLimit: Int, onDismiss: @escaping ([Attachment]) -> Void) {
         self._isPresented = isPresented
+        self.attachmentLimit = attachmentLimit
         self.onDismiss = onDismiss
     }
 
     public func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration = PHPickerConfiguration()
-        configuration.selectionLimit = 5
+        configuration.selectionLimit = attachmentLimit
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
         picker.view.tintColor = UIColor(infoColor)
@@ -58,10 +60,10 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
 
             let dispatchGroup = DispatchGroup()
 
-            for attachment in results {
-                if attachment.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    dispatchGroup.enter()
+            results.forEach { attachment in
+                dispatchGroup.enter()
 
+                if attachment.itemProvider.canLoadObject(ofClass: UIImage.self) {
                     attachment.itemProvider.loadObject(ofClass: UIImage.self) { newImage, error in
                         if let selectedImage = newImage as? UIImage, let fileName = attachment.itemProvider.suggestedName {
                             let imageObject = Attachment(image: selectedImage.resizeImageIfNeededWhilePreservingAspectRatio(), name: fileName)
@@ -72,18 +74,17 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
                         dispatchGroup.leave()
                     }
                 } else if attachment.itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-                    dispatchGroup.enter()
-
                     attachment.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { url, error in // it will return the temporary file address, so immediately retrieving video as data from the temporary url.
                         if let url = url, let fileName = attachment.itemProvider.suggestedName {
                             do {
                                 let data = try Data(contentsOf: url)
                                 let videoObject = Attachment(videoData: data, video: url, name: fileName)
                                 attachments.append(videoObject)
+                                try? FileManager.default.removeItem(at: url) // Clean up temporary file
                             } catch {
                                 LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error loading data from URL: \(error)")
                             }
-                        } else if let error = error {
+                        } else if let error {
                             LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading video: \(error)")
                         }
                         dispatchGroup.leave()

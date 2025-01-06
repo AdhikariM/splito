@@ -1,12 +1,11 @@
 /* eslint-disable */
-
-import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
-import { onGroupWrite } from './users_service/users_service'; 
-import { onActivityCreate } from './notifications_service/notifications_service';
-import { MailService } from './mail_service/mail_service';
-import { SupportService } from './contact_support_service/contact_support_service';
+import { onGroupWrite } from './users/users_service'; 
+import { onActivityCreate } from './notifications/notifications_service';
+import {FeedbackService} from "./feedback/feedback_service";
+import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import { MailService } from './mail/mail_service';
 
 // Initialize Firebase app if not already initialized
 if (admin.apps.length === 0) {
@@ -21,25 +20,27 @@ if (admin.apps.length === 0) {
   logger.debug('Firebase app already initialized');
 }    
 
-// Initialize MailService and SupportService
 const mailService = new MailService();
-const supportService = new SupportService(mailService);
-
-// Cloud Function to send support emails via HTTP request
-exports.sendSupportEmail = functions.https.onRequest(async (req, res) => {
-  try {
-    const supportData = req.body; // Assuming support data is sent in the body of the request
-    if (!supportData) {
-      res.status(400).send('Missing support data');
-      return;
-    }
-    await supportService.onContactSupportCreated(supportData);
-    res.status(200).send('Support email sent successfully');
-  } catch (error) {
-    logger.error('Error sending support email:', error);
-    res.status(500).send('Error sending support email');
-  }
-});
+const REGION = "asia-south1";
+const feedbackService = new FeedbackService(mailService);
 
 exports.onGroupWrite = onGroupWrite;
 exports.onActivityCreate = onActivityCreate;
+
+export const feedbackCreateObserver = onDocumentCreated(
+  { region: REGION, document: "feedbacks/{feedbackId}" },
+  async (event) => {
+    const snapshot = event.data;
+    if (!snapshot) {
+      logger.error("No data associated with the event");
+      return;
+    }
+    const data = snapshot.data();
+
+    try {
+      await feedbackService.onFeedbackCreated(data);
+    } catch (error) {
+      logger.error('Error handling feedback:', error);
+    }
+  }
+);

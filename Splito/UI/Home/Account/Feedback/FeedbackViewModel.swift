@@ -10,6 +10,7 @@ import Data
 import BaseStyle
 
 class FeedbackViewModel: BaseViewModel, ObservableObject {
+    let MAX_ATTACHMENTS = 5
     private let TITLE_CHARACTER_MIN_LIMIT = 3
     private let VIDEO_SIZE_LIMIT_IN_BYTES = 5000000 // 5 MB
     private let IMAGE_SIZE_LIMIT_IN_BYTES = 3000000 // 3 MB
@@ -53,26 +54,21 @@ extension FeedbackViewModel {
             return
         }
 
-        let feedback = Feedback(title: title, description: description, userId: userId,
-                                attachmentUrls: attachmentsUrls.map { $0.url }, appVersion: DeviceInfo.appVersionName,
-                                deviceName: UIDevice.current.name, deviceOsVersion: UIDevice.current.systemVersion)
-        submitFeedback(feedback: feedback)
-    }
-
-    private func submitFeedback(feedback: Feedback) {
         Task { [weak self] in
+            guard let self else { return }
             do {
-                self?.showLoader = true
-                try await self?.feedbackRepository.addFeedback(feedback: feedback)
-                self?.showLoader = false
-                self?.showAlert = true
-                self?.alert = .init(message: "Thanks! your feedback has been recorded.",
-                                    positiveBtnTitle: "Ok",
-                                    positiveBtnAction: { [weak self] in self?.router.pop() })
+                self.showLoader = true
+                let feedback = Feedback(title: self.title, description: self.description, userId: userId,
+                                        attachmentUrls: self.attachmentsUrls.map { $0.url }, appVersion: DeviceInfo.appVersionName,
+                                        deviceName: DeviceInfo.deviceName, deviceOsVersion: DeviceInfo.deviceOsVersion)
+                try await self.feedbackRepository.addFeedback(feedback: feedback)
+                self.showLoader = false
+                self.alert = .init(message: "Thanks! your feedback has been recorded.",
+                                   positiveBtnTitle: "Ok",
+                                   positiveBtnAction: { [weak self] in self?.router.pop() })
                 LogD("FeedbackViewModel: \(#function) Feedback submitted successfully.")
             } catch {
-                self?.showLoader = false
-                self?.handleError()
+                self.handleError()
                 LogE("FeedbackViewModel: \(#function) Failed to submit feedback: \(error).")
             }
         }
@@ -81,11 +77,16 @@ extension FeedbackViewModel {
     func onMediaPickerSheetDismiss(attachments: [Attachment]) {
         for attachment in attachments {
             selectedAttachments.append(attachment)
-            upload(attachment: attachment)
+            handleAttachmentUpload(attachment: attachment)
         }
     }
 
     func handleAttachmentTap() {
+        if attachmentsUrls.count >= MAX_ATTACHMENTS {
+            handleError(message: "Maximum \(MAX_ATTACHMENTS) attachments allowed.")
+            return
+        }
+
         if selectedAttachments.isEmpty {
             showMediaPicker = true
         } else {
@@ -112,7 +113,7 @@ extension FeedbackViewModel {
     func onRetryAttachment(_ attachment: Attachment) {
         guard let index = selectedAttachments.firstIndex(where: { $0.id == attachment.id }) else { return }
         failedAttachments.removeAll { $0.id == attachment.id }
-        upload(attachment: selectedAttachments[index])
+        handleAttachmentUpload(attachment: selectedAttachments[index])
         uploadedAttachmentIDs.insert(attachment.id)
     }
 
@@ -156,19 +157,36 @@ extension FeedbackViewModel {
         }
     }
 
-    private func upload(attachment: Attachment) {
+    private func handleAttachmentUpload(attachment: Attachment) {
         if uploadedAttachmentIDs.contains(attachment.id) { return }
 
         if let imageData = attachment.image?.jpegRepresentationData {
-            validateAndUploadAttachment(data: imageData, attachment: attachment, maxSize: IMAGE_SIZE_LIMIT_IN_BYTES, type: .image)
+            uploadAttachment(data: imageData, attachment: attachment, maxSize: IMAGE_SIZE_LIMIT_IN_BYTES, type: .image)
         } else if let videoData = attachment.videoData {
-            validateAndUploadAttachment(data: videoData, attachment: attachment, maxSize: VIDEO_SIZE_LIMIT_IN_BYTES, type: .video)
+            uploadAttachment(data: videoData, attachment: attachment, maxSize: VIDEO_SIZE_LIMIT_IN_BYTES, type: .video)
         }
     }
 
-    private func validateAndUploadAttachment(data: Data, attachment: Attachment, maxSize: Int, type: StorageManager.AttachmentType) {
+    private func uploadAttachment(data: Data, attachment: Attachment, maxSize: Int, type: StorageManager.AttachmentType) {
         if data.count <= maxSize {
-            uploadAttachment(data: data, attachment: attachment, type: type)
+            uploadingAttachments.append(attachment)
+
+            Task { [weak self] in
+                do {
+                    let attachmentId = attachment.id
+                    let attachmentUrl = try await self?.feedbackRepository.uploadAttachment(attachmentId: attachmentId,
+                                                                                            attachmentData: data, attachmentType: type)
+                    if let attachmentUrl {
+                        self?.attachmentsUrls.append((id: attachmentId, url: attachmentUrl))
+                        self?.uploadingAttachments.removeAll { $0.id == attachmentId }
+                    }
+                    LogD("FeedbackViewModel: \(#function) Attachment uploaded successfully.")
+                } catch {
+                    self?.failedAttachments.append(attachment)
+                    self?.uploadingAttachments.removeAll { $0.id == attachment.id }
+                    LogE("FeedbackViewModel: \(#function) Failed to upload attachment: \(error)")
+                }
+            }
         } else {
             selectedAttachments.removeAll { $0.id == attachment.id }
             let message = type == .image ? "The image size exceeds the maximum allowed limit. Please select a smaller image."
@@ -177,32 +195,12 @@ extension FeedbackViewModel {
         }
     }
 
-    private func uploadAttachment(data: Data, attachment: Attachment, type: StorageManager.AttachmentType) {
-        uploadingAttachments.append(attachment)
-
-        Task { [weak self] in
-            do {
-                let attachmentId = attachment.id
-                let attachmentUrl = try await self?.feedbackRepository.uploadAttachment(attachmentId: attachmentId,
-                                                                                        attachmentData: data, attachmentType: type)
-                if let attachmentUrl {
-                    self?.attachmentsUrls.append((id: attachmentId, url: attachmentUrl))
-                    self?.uploadingAttachments.removeAll { $0.id == attachmentId }
-                }
-                LogD("FeedbackViewModel: \(#function) Attachment uploaded successfully.")
-            } catch {
-                self?.failedAttachments.append(attachment)
-                self?.uploadingAttachments.removeAll { $0.id == attachment.id }
-                LogE("FeedbackViewModel: \(#function) Failed to upload attachment: \(error)")
-            }
-        }
-    }
-
     // MARK: - Error Handling
     func handleError(message: String? = nil) {
         if let message {
             showToastFor(toast: ToastPrompt(type: .error, title: "Error", message: message))
         } else {
+            showLoader = false
             showToastForError()
         }
     }

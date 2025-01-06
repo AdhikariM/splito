@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
+import {SendEmailCommand, SESClient} from "@aws-sdk/client-ses";
 import { config } from 'firebase-functions';
 
 // Fetch AWS credentials securely from Firebase configuration
@@ -11,7 +11,7 @@ if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
   throw new Error('AWS credentials are not set in Firebase Functions config');
 }
 
-const REGION = 'asia-south1';
+const REGION = "ap-south-1";
 const sesClient = new SESClient({
   credentials: {
     accessKeyId: AWS_ACCESS_KEY_ID,
@@ -21,41 +21,33 @@ const sesClient = new SESClient({
 });
 
 export class MailService {
-  private createSendEmailCommand(
-    toAddresses: string[],
-    fromAddress: string,
-    subject: string,
-    body: string
-  ): SendEmailCommand {
+  private createSendEmailCommand(toAddresses: string[], fromAddress: string, subject: string, body: string): SendEmailCommand {
     return new SendEmailCommand({
       Destination: {
+        CcAddresses: [
+        ],
         ToAddresses: toAddresses,
       },
       Message: {
         Body: {
           Text: {
-            Charset: 'UTF-8',
+            Charset: "UTF-8",
             Data: body,
           },
         },
         Subject: {
-          Charset: 'UTF-8',
+          Charset: "UTF-8",
           Data: subject,
         },
       },
       Source: fromAddress,
-      ReplyToAddresses: [],
+      ReplyToAddresses: [
+      ],
     });
   }
 
   async sendEmail(to: string[], from: string, subject: string, body: string): Promise<void> {
     const mail = this.createSendEmailCommand(to, from, subject, body);
-    try {
-      const response = await sesClient.send(mail);
-      console.log('Email sent successfully:', response);
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw new Error('Failed to send email');
-    }
+    await sesClient.send(mail);
   }
 }

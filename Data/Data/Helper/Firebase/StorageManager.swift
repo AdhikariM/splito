@@ -35,7 +35,6 @@ public class StorageManager: ObservableObject {
     public enum AttachmentType {
         case image
         case video
-        case other
 
         var contentType: String {
             switch self {
@@ -43,8 +42,6 @@ public class StorageManager: ObservableObject {
                 return "image/jpg"
             case .video:
                 return "video/mp4"
-            case .other:
-                return "application/octet-stream"
             }
         }
     }

@@ -22,12 +22,10 @@ struct FeedbackView: View {
                 VSpacer(24)
 
                 VStack(spacing: 24) {
-                    FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField,
-                                      isSelected: focusField == .title, isValidTitle: viewModel.isValidTitle,
+                    FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField, isValidTitle: viewModel.isValidTitle,
                                       shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
 
-                    FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField,
-                                            isSelected: focusField == .description)
+                    FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField)
 
                     FeedbackAddAttachmentView(
                         attachedMedia: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
@@ -52,7 +50,6 @@ struct FeedbackView: View {
         .toastView(toast: $viewModel.toast)
         .onAppear {
             focusField = .title
-            UIScrollView.appearance().keyboardDismissMode = .interactive
         }
         .toolbarRole(.editor)
         .toolbar {
@@ -61,10 +58,11 @@ struct FeedbackView: View {
             }
         }
         .onTapGesture {
-            UIApplication.shared.endEditing()
+            focusField = nil
         }
         .sheet(isPresented: $viewModel.showMediaPicker) {
             MultiMediaSelectionPickerView(isPresented: $viewModel.showMediaPicker,
+                                          attachmentLimit: abs(viewModel.attachmentsUrls.count - viewModel.MAX_ATTACHMENTS),
                                           onDismiss: viewModel.onMediaPickerSheetDismiss(attachments:))
         }
     }
@@ -75,7 +73,6 @@ private struct FeedbackTitleView: View {
     @Binding var titleText: String
     var focusField: FocusState<FeedbackViewModel.FocusedField?>.Binding
 
-    let isSelected: Bool
     let isValidTitle: Bool
     let shouldShowValidationMessage: Bool
 
@@ -87,7 +84,7 @@ private struct FeedbackTitleView: View {
                 .tracking(-0.4)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-            VSpacer(10)
+            VSpacer(12)
 
             TextField("", text: $titleText)
                 .font(.subTitle1())
@@ -97,24 +94,16 @@ private struct FeedbackTitleView: View {
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.sentences)
                 .padding(8)
-                .submitLabel(.next)
-                .onSubmit {
-                    if focusField.wrappedValue == .title {
-                        focusField.wrappedValue = .description
-                    } else if focusField.wrappedValue == .description {
-                        focusField.wrappedValue = nil
-                    }
-                }
+                .submitLabel(.done)
                 .onTapGestureForced {
                     focusField.wrappedValue = .title
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 7)
-                        .stroke(shouldShowValidationMessage && !isValidTitle ? errorColor :
-                                    isSelected ? primaryColor : outlineColor, lineWidth: 1)
+                        .stroke(shouldShowValidationMessage && !isValidTitle ? errorColor : outlineColor, lineWidth: 1)
                 )
 
-            VSpacer(3)
+            VSpacer(4)
 
             Text(shouldShowValidationMessage ? (isValidTitle ? " " : "Minimum 3 characters are required") : " ")
                 .foregroundColor(errorColor)
@@ -122,6 +111,11 @@ private struct FeedbackTitleView: View {
                 .foregroundColor(errorColor)
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
+                .onChange(of: shouldShowValidationMessage) { showMessage in
+                    if showMessage && !isValidTitle {
+                        focusField.wrappedValue = .title
+                    }
+                }
         }
     }
 }
@@ -131,10 +125,8 @@ private struct FeedbackDescriptionView: View {
     @Binding var titleText: String
     var focusField: FocusState<FeedbackViewModel.FocusedField?>.Binding
 
-    let isSelected: Bool
-
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 12) {
             Text("Description")
                 .font(.body2())
                 .foregroundColor(disableText)
@@ -157,7 +149,7 @@ private struct FeedbackDescriptionView: View {
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 7)
-                        .stroke(isSelected ? primaryColor : outlineColor, lineWidth: 1)
+                        .stroke(outlineColor, lineWidth: 1)
                 )
         }
     }
@@ -185,12 +177,7 @@ private struct FeedbackAddAttachmentView: View {
                     attachment: attachment,
                     isUploading: uploadingAttachments.contains(where: { $0.id == attachment.id }),
                     showRetryButton: failedAttachments.contains(where: { $0.id == attachment.id }),
-                    onRetryButtonTap: {_ in
-                        onRetryButtonTap(attachment)
-                    },
-                    onRemoveAttachmentTap: {_ in
-                        onRemoveAttachmentTap(attachment)
-                    }
+                    onRetryButtonTap: onRetryButtonTap, onRemoveAttachmentTap: onRemoveAttachmentTap
                 )
             }
 
@@ -204,8 +191,9 @@ private struct FeedbackAddAttachmentView: View {
                     Text("Add attachment")
                         .font(.body1())
                 }
-                .foregroundColor(uploadingAttachments.isEmpty ? disableText : primaryText)
+                .foregroundColor(disableText)
             }
+            .disabled(!uploadingAttachments.isEmpty)
             .buttonStyle(.scale)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -271,17 +259,16 @@ private struct AttachmentThumbnailView: View {
             }
 
             Rectangle()
-                .frame(width: 50, height: 50, alignment: .leading)
-                .foregroundColor(isUploading || showRetryButton ? lowestText : .clear)
+                .foregroundColor(isUploading || showRetryButton ? secondaryLightText : .clear)
 
             if attachment.video != nil && !isUploading {
                 Image(systemName: "play.fill")
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
                     .foregroundColor(primaryColor)
             }
 
             if isUploading {
-                ImageLoaderView(tintColor: primaryText)
+                ImageLoaderView(tintColor: primaryDarkText)
             }
 
             if showRetryButton {
@@ -289,7 +276,7 @@ private struct AttachmentThumbnailView: View {
                     onRetryButtonTap(attachment)
                 } label: {
                     Image(systemName: "arrow.clockwise.circle.fill")
-                        .font(.system(size: 20))
+                        .font(.system(size: 22))
                         .foregroundColor(primaryColor)
                 }
             }

@@ -19,7 +19,6 @@
 		2156A8B02C24069800CFAB64 /* GroupTransactionsRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2156A8AF2C24069800CFAB64 /* GroupTransactionsRouteView.swift */; };
 		2163D3A92D265A7D004B4F20 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3A82D265A7D004B4F20 /* FeedbackView.swift */; };
 		2163D3AB2D265A8C004B4F20 /* FeedbackViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3AA2D265A8C004B4F20 /* FeedbackViewModel.swift */; };
-		2163D3BA2D27D839004B4F20 /* MultiMediaSelectionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3B92D27D839004B4F20 /* MultiMediaSelectionPickerView.swift */; };
 		217620482C50DD6300FED0D4 /* GroupListWithDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217620472C50DD6300FED0D4 /* GroupListWithDetailView.swift */; };
 		2177692B2C203160009B3B37 /* GroupTransactionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2177692A2C203160009B3B37 /* GroupTransactionDetailView.swift */; };
 		2177692D2C20316B009B3B37 /* GroupTransactionDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2177692C2C20316B009B3B37 /* GroupTransactionDetailViewModel.swift */; };
@@ -167,7 +166,6 @@
 		2156A8AF2C24069800CFAB64 /* GroupTransactionsRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTransactionsRouteView.swift; sourceTree = "<group>"; };
 		2163D3A82D265A7D004B4F20 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		2163D3AA2D265A8C004B4F20 /* FeedbackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackViewModel.swift; sourceTree = "<group>"; };
-		2163D3B92D27D839004B4F20 /* MultiMediaSelectionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiMediaSelectionPickerView.swift; sourceTree = "<group>"; };
 		217620472C50DD6300FED0D4 /* GroupListWithDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupListWithDetailView.swift; sourceTree = "<group>"; };
 		2177692A2C203160009B3B37 /* GroupTransactionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTransactionDetailView.swift; sourceTree = "<group>"; };
 		2177692C2C20316B009B3B37 /* GroupTransactionDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTransactionDetailViewModel.swift; sourceTree = "<group>"; };
@@ -351,7 +349,6 @@
 			children = (
 				2163D3A82D265A7D004B4F20 /* FeedbackView.swift */,
 				2163D3AA2D265A8C004B4F20 /* FeedbackViewModel.swift */,
-				2163D3B92D27D839004B4F20 /* MultiMediaSelectionPickerView.swift */,
 			);
 			path = Feedback;
 			sourceTree = "<group>";
@@ -1089,7 +1086,6 @@
 				D89C933D2BC020B200FACD16 /* AccountHomeViewModel.swift in Sources */,
 				D8E244BD2B98444900C6C82A /* CreateGroupViewModel.swift in Sources */,
 				D83344632C0EF1FA00CD9F05 /* GroupTotalsViewModel.swift in Sources */,
-				2163D3BA2D27D839004B4F20 /* MultiMediaSelectionPickerView.swift in Sources */,
 				D8AC26F32B84B12800CEAAD3 /* OnboardView.swift in Sources */,
 				D8D6C3A02B79F8110023CF08 /* AppDelegate.swift in Sources */,
 				D8AC26F42B84B12800CEAAD3 /* OnboardViewModel.swift in Sources */,

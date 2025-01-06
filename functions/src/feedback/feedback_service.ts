@@ -39,8 +39,8 @@ export class FeedbackService {
     }
 
     await this.mailService.sendEmail(
-      ["nirali.s@canopas.com"],
-      "no-reply@canbook.in",
+      ["contact@canopas.com"],
+      "contact@canopas.com",
       "Splito: Feedback Request Created",
       body,
     );

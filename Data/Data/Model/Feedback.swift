@@ -44,19 +44,3 @@ public struct Feedback: Codable {
         case createdAt = "created_at"
     }
 }
-
-public struct Attachment {
-    public var id = UUID().uuidString
-    public var image: UIImage?
-    public var videoData: Data?
-    public var video: URL?
-    public var name: String
-
-    public init(id: String = UUID().uuidString, image: UIImage? = nil, videoData: Data? = nil, video: URL? = nil, name: String) {
-        self.id = id
-        self.image = image
-        self.videoData = videoData
-        self.video = video
-        self.name = name
-    }
-}

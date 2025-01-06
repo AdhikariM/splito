@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		211BCF222D2C071A001F4679 /* MultiMediaSelectionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 211BCF212D2C071A001F4679 /* MultiMediaSelectionPickerView.swift */; };
 		213A1F2A2C52335D00BF9800 /* CheckmarkButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213A1F292C52335D00BF9800 /* CheckmarkButton.swift */; };
 		213F377E2C416C9C00972316 /* ScrollToTopButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213F377D2C416C9C00972316 /* ScrollToTopButton.swift */; };
 		2163D3B82D27B2FD004B4F20 /* MediaPickerOptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2163D3B72D27B2FD004B4F20 /* MediaPickerOptionsView.swift */; };
@@ -69,6 +70,7 @@
 
 /* Begin PBXFileReference section */
 		174198EE4AF2FC82DADEB060 /* Pods_BaseStyle.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BaseStyle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		211BCF212D2C071A001F4679 /* MultiMediaSelectionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiMediaSelectionPickerView.swift; sourceTree = "<group>"; };
 		213A1F292C52335D00BF9800 /* CheckmarkButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkButton.swift; sourceTree = "<group>"; };
 		213F377D2C416C9C00972316 /* ScrollToTopButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollToTopButton.swift; sourceTree = "<group>"; };
 		2163D3B72D27B2FD004B4F20 /* MediaPickerOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPickerOptionsView.swift; sourceTree = "<group>"; };
@@ -305,6 +307,7 @@
 				D8D14A4F2BA090F000F45FF2 /* ShareSheetView.swift */,
 				D82174BD2BBAD86D00DB42C3 /* ProfileImageView.swift */,
 				D8E244C02B986CD800C6C82A /* ImagePickerView.swift */,
+				211BCF212D2C071A001F4679 /* MultiMediaSelectionPickerView.swift */,
 				2163D3B72D27B2FD004B4F20 /* MediaPickerOptionsView.swift */,
 			);
 			path = CustomUI;
@@ -515,6 +518,7 @@
 				D8D42AAC2B872A7C009B345D /* ToastView.swift in Sources */,
 				217620462C4F7CE700FED0D4 /* BackButton.swift in Sources */,
 				D8EB5E952CF8B12B005B68D9 /* ZoomableImageView.swift in Sources */,
+				211BCF222D2C071A001F4679 /* MultiMediaSelectionPickerView.swift in Sources */,
 				D8D42A952B85F8A2009B345D /* Bundle+Extension.swift in Sources */,
 				21D26E232CA199630090488B /* CapsuleButton.swift in Sources */,
 				213A1F2A2C52335D00BF9800 /* CheckmarkButton.swift in Sources */,

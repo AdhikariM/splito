@@ -2,13 +2,11 @@
 //  MultiMediaSelectionPickerView.swift
 //  Splito
 //
-//  Created by Nirali Sonani on 03/01/25.
+//  Created by Nirali Sonani on 06/01/25.
 //
 
 import SwiftUI
 import PhotosUI
-import Data
-import BaseStyle
 
 public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
 
@@ -69,7 +67,7 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
                             let imageObject = Attachment(image: selectedImage.resizeImageIfNeededWhilePreservingAspectRatio(), name: fileName)
                             attachments.append(imageObject)
                         } else if let error = error {
-                            LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading image: \(error)")
+                            print("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading image: \(error)")
                         }
                         dispatchGroup.leave()
                     }
@@ -82,10 +80,10 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
                                 attachments.append(videoObject)
                                 try? FileManager.default.removeItem(at: url) // Clean up temporary file
                             } catch {
-                                LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error loading data from URL: \(error)")
+                                print("MultiMediaSelectionPickerCoordinator: \(#function) Error loading data from URL: \(error)")
                             }
                         } else if let error {
-                            LogE("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading video: \(error)")
+                            print("MultiMediaSelectionPickerCoordinator: \(#function) Error in loading video: \(error)")
                         }
                         dispatchGroup.leave()
                     }
@@ -97,5 +95,22 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
                 self.onDismiss(attachments)
             }
         }
+    }
+}
+
+// MARK: - Struct to hold attachment data
+public struct Attachment {
+    public var id = UUID().uuidString
+    public var image: UIImage?
+    public var videoData: Data?
+    public var video: URL?
+    public var name: String
+
+    public init(id: String = UUID().uuidString, image: UIImage? = nil, videoData: Data? = nil, video: URL? = nil, name: String) {
+        self.id = id
+        self.image = image
+        self.videoData = videoData
+        self.video = video
+        self.name = name
     }
 }

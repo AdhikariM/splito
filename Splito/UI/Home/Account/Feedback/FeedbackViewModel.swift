@@ -63,6 +63,7 @@ extension FeedbackViewModel {
                                         deviceName: DeviceInfo.deviceName, deviceOsVersion: DeviceInfo.deviceOsVersion)
                 try await self.feedbackRepository.addFeedback(feedback: feedback)
                 self.showLoader = false
+                self.showAlert = true
                 self.alert = .init(message: "Thanks! your feedback has been recorded.",
                                    positiveBtnTitle: "Ok",
                                    positiveBtnAction: { [weak self] in self?.router.pop() })

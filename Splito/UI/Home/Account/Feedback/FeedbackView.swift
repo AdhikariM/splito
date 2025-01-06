@@ -22,18 +22,22 @@ struct FeedbackView: View {
                 VSpacer(24)
 
                 VStack(spacing: 24) {
-                    FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField, isValidTitle: viewModel.isValidTitle,
+                    FeedbackTitleView(titleText: $viewModel.title, focusField: $focusField,
+                                      isValidTitle: viewModel.isValidTitle,
                                       shouldShowValidationMessage: viewModel.shouldShowValidationMessage)
 
                     FeedbackDescriptionView(titleText: $viewModel.description, focusField: $focusField)
 
-                    FeedbackAddAttachmentView(
-                        attachedMedia: $viewModel.selectedAttachments, uploadingAttachments: $viewModel.uploadingAttachments,
-                        failedAttachments: $viewModel.failedAttachments, selectedAttachments: $viewModel.selectedAttachments,
-                        showMediaPickerOption: $viewModel.showMediaPickerOption, handleAttachmentTap: viewModel.handleAttachmentTap,
-                        onRemoveAttachmentTap: viewModel.onRemoveAttachment, onRetryButtonTap: viewModel.onRetryAttachment(_:),
-                        handleActionSelection: viewModel.handleActionSelection(_:), focusField: _focusField
-                    )
+                    FeedbackAddAttachmentView(attachedMedia: $viewModel.selectedAttachments,
+                                              uploadingAttachments: $viewModel.uploadingAttachments,
+                                              failedAttachments: $viewModel.failedAttachments,
+                                              selectedAttachments: $viewModel.selectedAttachments,
+                                              showMediaPickerOption: $viewModel.showMediaPickerOption,
+                                              handleAddAttachmentTap: viewModel.handleAddAttachmentTap,
+                                              onRemoveAttachmentTap: viewModel.onRemoveAttachment,
+                                              onRetryButtonTap: viewModel.onRetryAttachment(_:),
+                                              handleActionSelection: viewModel.handleActionSelection(_:),
+                                              focusField: _focusField)
 
                     PrimaryButton(
                         text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
@@ -61,9 +65,11 @@ struct FeedbackView: View {
             focusField = nil
         }
         .sheet(isPresented: $viewModel.showMediaPicker) {
-            MultiMediaSelectionPickerView(isPresented: $viewModel.showMediaPicker,
-                                          attachmentLimit: abs(viewModel.attachmentsUrls.count - viewModel.MAX_ATTACHMENTS),
-                                          onDismiss: viewModel.onMediaPickerSheetDismiss(attachments:))
+            MultiMediaSelectionPickerView(
+                isPresented: $viewModel.showMediaPicker,
+                attachmentLimit: abs(viewModel.attachmentsUrls.count - viewModel.MAX_ATTACHMENTS),
+                onDismiss: viewModel.onMediaPickerSheetDismiss(attachments:)
+            )
         }
     }
 }
@@ -163,7 +169,7 @@ private struct FeedbackAddAttachmentView: View {
     @Binding var selectedAttachments: [Attachment]
     @Binding var showMediaPickerOption: Bool
 
-    let handleAttachmentTap: () -> Void
+    let handleAddAttachmentTap: () -> Void
     let onRemoveAttachmentTap: (Attachment) -> Void
     let onRetryButtonTap: (Attachment) -> Void
     let handleActionSelection: (ActionsOfSheet) -> Void
@@ -183,7 +189,7 @@ private struct FeedbackAddAttachmentView: View {
 
             Button {
                 focusField = nil
-                handleAttachmentTap()
+                handleAddAttachmentTap()
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "paperclip")
@@ -197,8 +203,7 @@ private struct FeedbackAddAttachmentView: View {
             .buttonStyle(.scale)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .confirmationDialog("Choose mode\nPlease choose your preferred mode to includes attachment with feedback",
-                            isPresented: $showMediaPickerOption, titleVisibility: .visible) {
+        .confirmationDialog("Choose mode\nPlease choose your preferred mode to includes attachment with feedback", isPresented: $showMediaPickerOption, titleVisibility: .visible) {
             MediaPickerOptionsView(withRemoveAllOption: $selectedAttachments.count >= 1,
                                    handleActionSelection: handleActionSelection)
         }

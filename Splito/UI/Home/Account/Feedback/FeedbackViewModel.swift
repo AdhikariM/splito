@@ -18,20 +18,20 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
     @Inject private var preference: SplitoPreference
     @Inject private var feedbackRepository: FeedbackRepository
 
-    @Published var description: String = ""
-    @Published private var uploadedAttachmentIDs: Set<String> = Set<String>()
-
     @Published var failedAttachments: [Attachment] = []
-    @Published var attachmentsUrls: [(id: String, url: String)] = []
     @Published var selectedAttachments: [Attachment] = []
     @Published var uploadingAttachments: [Attachment] = []
+    @Published var attachmentsUrls: [(id: String, url: String)] = []
+    @Published private var uploadedAttachmentIDs: Set<String> = Set<String>()
 
     @Published var showMediaPicker: Bool = false
     @Published var showMediaPickerOption: Bool = false
     @Published private(set) var showLoader: Bool = false
     @Published private(set) var isValidTitle: Bool = false
     @Published private(set) var shouldShowValidationMessage: Bool = false
-
+    
+    @Published var description: String = ""
+    
     @Published var title: String = "" {
         didSet {
             isValidTitle = title.count >= TITLE_CHARACTER_MIN_LIMIT
@@ -46,7 +46,7 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
     }
 }
 
-// MARK: - Action Items
+// MARK: - User Actions
 extension FeedbackViewModel {
     func onSubmitBtnTap() {
         guard let userId = preference.user?.id, isValidTitle else {
@@ -58,9 +58,11 @@ extension FeedbackViewModel {
             guard let self else { return }
             do {
                 self.showLoader = true
-                let feedback = Feedback(title: self.title, description: self.description, userId: userId,
-                                        attachmentUrls: self.attachmentsUrls.map { $0.url }, appVersion: DeviceInfo.appVersionName,
-                                        deviceName: DeviceInfo.deviceName, deviceOsVersion: DeviceInfo.deviceOsVersion)
+                let feedback = Feedback(
+                    title: self.title, description: self.description, userId: userId,
+                    attachmentUrls: self.attachmentsUrls.map { $0.url }, appVersion: DeviceInfo.appVersionName,
+                    deviceName: DeviceInfo.deviceName, deviceOsVersion: DeviceInfo.deviceOsVersion
+                )
                 try await self.feedbackRepository.addFeedback(feedback: feedback)
                 self.showLoader = false
                 self.showAlert = true
@@ -82,7 +84,7 @@ extension FeedbackViewModel {
         }
     }
 
-    func handleAttachmentTap() {
+    func handleAddAttachmentTap() {
         if attachmentsUrls.count >= MAX_ATTACHMENTS {
             handleError(message: "Maximum \(MAX_ATTACHMENTS) attachments allowed.")
             return

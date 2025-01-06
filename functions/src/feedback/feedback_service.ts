@@ -15,24 +15,20 @@ export class FeedbackService {
     for (const key of Object.keys(support)) {
       let value = support[key];
 
-      // Check if the value is a Date object or has to be formatted & Convert created_at to local (IST) time
+      // Check if the value is a Date object & Convert created_at to local (IST) time
       if (key === "created_at" && typeof value === "object") {
-        const date = new Date(value.seconds * 1000); // Convert Firebase Timestamp to Date
+        const date = new Date(value.seconds * 1000);
+        
         value = date.toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata", // Set timezone to IST
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
+          timeZone: "Asia/Kolkata", year: "numeric",
+          month: "long", day: "numeric", hour: "2-digit",
+          minute: "2-digit", second: "2-digit", hour12: true,
         });
       }
 
       // If the value is attachment urls separate them with a line break
       if (key === "attachment_urls" && Array.isArray(value)) {
-        value = value.join("\n"); // Each URL in a new line
+        value = value.join("\n");
       }
 
       body += `${key}: ${value}\n`;

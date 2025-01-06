@@ -20,8 +20,9 @@ public struct Feedback: Codable {
     var deviceOsVersion: String
     var createdAt: Timestamp
 
-    public init(title: String, description: String, userId: String, attachmentUrls: [String]? = nil,
-                appVersion: String, deviceName: String, deviceOsVersion: String, createdAt: Timestamp = Timestamp()) {
+    public init(title: String, description: String, userId: String,
+                attachmentUrls: [String]? = nil, appVersion: String, deviceName: String,
+                deviceOsVersion: String, createdAt: Timestamp = Timestamp()) {
         self.title = title
         self.description = description
         self.userId = userId

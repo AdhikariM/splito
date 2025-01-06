@@ -120,7 +120,8 @@ private struct AddGroupImageView: View {
         .padding(.horizontal, 16)
         .onTapGesture(perform: handleProfileTap)
         .confirmationDialog("", isPresented: $showImagePickerOptions, titleVisibility: .hidden) {
-            MediaPickerOptionsView(image: image, imageUrl: imageUrl, handleActionSelection: handleActionSelection)
+            MediaPickerOptionsView(image: image, imageUrl: imageUrl,
+                                   handleActionSelection: handleActionSelection)
         }
     }
 }

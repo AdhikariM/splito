@@ -21,7 +21,7 @@ class FeedbackStore: ObservableObject {
         do {
             try database.collection(self.COLLECTION_NAME).addDocument(from: feedback)
         } catch {
-            LogE("ShareCodeStore: \(#function) Failed to add shared code: \(error).")
+            LogE("FeedbackStore: \(#function) Failed to add feedback: \(error).")
             throw error
         }
     }

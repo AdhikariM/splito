@@ -44,7 +44,6 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
 
         let onDismiss: ([Attachment]) -> Void
 
-        let imageManager = PHImageManager.default()
         let imageRequestOptions = PHImageRequestOptions()
 
         public init(isPresented: Binding<Bool>, onDismiss: @escaping ([Attachment]) -> Void) {
@@ -55,7 +54,6 @@ public struct MultiMediaSelectionPickerView: UIViewControllerRepresentable {
         public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             imageRequestOptions.isSynchronous = true
             var attachments: [Attachment] = []
-
             let dispatchGroup = DispatchGroup()
 
             results.forEach { attachment in

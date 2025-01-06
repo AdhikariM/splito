@@ -508,6 +508,9 @@
     "Looks like there are no outstanding settlements in any of your groups yet." : {
 
     },
+    "Maximum %@ attachments allowed." : {
+      "extractionState" : "manual"
+    },
     "min ago" : {
       "extractionState" : "manual"
     },

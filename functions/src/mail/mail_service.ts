@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import {SendEmailCommand, SESClient} from "@aws-sdk/client-ses";
+import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses";
 import { config } from 'firebase-functions';
 
 // Fetch AWS credentials securely from Firebase configuration
@@ -12,6 +12,7 @@ if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
 }
 
 const REGION = "ap-south-1";
+
 const sesClient = new SESClient({
   credentials: {
     accessKeyId: AWS_ACCESS_KEY_ID,

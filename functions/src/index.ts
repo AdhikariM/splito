@@ -1,10 +1,11 @@
 /* eslint-disable */
 import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
-import { onGroupWrite } from './users/users_service'; 
+
+import { onGroupWrite } from './users/users_service';
 import { onActivityCreate } from './notifications/notifications_service';
-import {FeedbackService} from "./feedback/feedback_service";
-import {onDocumentCreated} from "firebase-functions/v2/firestore";
+import { FeedbackService } from "./feedback/feedback_service";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { MailService } from './mail/mail_service';
 
 // Initialize Firebase app if not already initialized

@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import {MailService} from "../mail/mail_service";
+import { MailService } from "../mail/mail_service";
 
 export class FeedbackService {
   private mailService: MailService;

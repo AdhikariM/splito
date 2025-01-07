@@ -10,6 +10,7 @@ import Data
 import BaseStyle
 
 class FeedbackViewModel: BaseViewModel, ObservableObject {
+
     let MAX_ATTACHMENTS = 5
     private let TITLE_CHARACTER_MIN_LIMIT = 3
     private let VIDEO_SIZE_LIMIT_IN_BYTES = 5000000 // 5 MB
@@ -29,9 +30,9 @@ class FeedbackViewModel: BaseViewModel, ObservableObject {
     @Published private(set) var showLoader: Bool = false
     @Published private(set) var isValidTitle: Bool = false
     @Published private(set) var shouldShowValidationMessage: Bool = false
-    
+
     @Published var description: String = ""
-    
+
     @Published var title: String = "" {
         didSet {
             isValidTitle = title.count >= TITLE_CHARACTER_MIN_LIMIT
@@ -85,11 +86,6 @@ extension FeedbackViewModel {
     }
 
     func handleAddAttachmentTap() {
-        if attachmentsUrls.count >= MAX_ATTACHMENTS {
-            handleError(message: "Maximum \(MAX_ATTACHMENTS) attachments allowed.")
-            return
-        }
-
         if selectedAttachments.isEmpty {
             showMediaPicker = true
         } else {
@@ -123,6 +119,10 @@ extension FeedbackViewModel {
     func handleActionSelection(_ action: ActionsOfSheet) {
         switch action {
         case .gallery:
+            if attachmentsUrls.count >= MAX_ATTACHMENTS {
+                handleError(message: "Maximum \(MAX_ATTACHMENTS) attachments allowed.")
+                return
+            }
             showMediaPicker = true
         case .removeAll:
             removeAllAttachments()
@@ -178,7 +178,8 @@ extension FeedbackViewModel {
                 do {
                     let attachmentId = attachment.id
                     let attachmentUrl = try await self?.feedbackRepository.uploadAttachment(attachmentId: attachmentId,
-                                                                                            attachmentData: data, attachmentType: type)
+                                                                                            attachmentData: data,
+                                                                                            attachmentType: type)
                     if let attachmentUrl {
                         self?.attachmentsUrls.append((id: attachmentId, url: attachmentUrl))
                         self?.uploadingAttachments.removeAll { $0.id == attachmentId }

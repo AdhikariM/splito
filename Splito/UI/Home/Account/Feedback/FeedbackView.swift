@@ -39,10 +39,8 @@ struct FeedbackView: View {
                                               handleActionSelection: viewModel.handleActionSelection(_:),
                                               focusField: _focusField)
 
-                    PrimaryButton(
-                        text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
-                        showLoader: viewModel.showLoader, onClick: viewModel.onSubmitBtnTap
-                    )
+                    PrimaryButton(text: "Submit", isEnabled: viewModel.uploadingAttachments.isEmpty,
+                                  showLoader: viewModel.showLoader, onClick: viewModel.onSubmitBtnTap)
                 }
                 .padding([.horizontal, .bottom], 16)
             }
@@ -109,19 +107,20 @@ private struct FeedbackTitleView: View {
                         .stroke(shouldShowValidationMessage && !isValidTitle ? errorColor : outlineColor, lineWidth: 1)
                 )
 
-            VSpacer(4)
-
-            Text(shouldShowValidationMessage ? (isValidTitle ? " " : "Minimum 3 characters are required") : " ")
-                .foregroundColor(errorColor)
-                .font(.body1(12))
-                .foregroundColor(errorColor)
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-                .onChange(of: shouldShowValidationMessage) { showMessage in
-                    if showMessage && !isValidTitle {
-                        focusField.wrappedValue = .title
+            if !isValidTitle && shouldShowValidationMessage {
+                Text("Minimum 3 characters are required")
+                    .foregroundColor(errorColor)
+                    .font(.body1(12))
+                    .foregroundColor(errorColor)
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .onChange(of: shouldShowValidationMessage) { showMessage in
+                        if showMessage && !isValidTitle {
+                            focusField.wrappedValue = .title
+                        }
                     }
-                }
+                    .padding(.top, 4)
+            }
         }
     }
 }
@@ -199,8 +198,8 @@ private struct FeedbackAddAttachmentView: View {
                 }
                 .foregroundColor(disableText)
             }
-            .disabled(!uploadingAttachments.isEmpty)
             .buttonStyle(.scale)
+            .padding(.top, attachedMedia.isEmpty ? 0 : 4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .confirmationDialog("Choose mode\nPlease choose your preferred mode to includes attachment with feedback", isPresented: $showMediaPickerOption, titleVisibility: .visible) {

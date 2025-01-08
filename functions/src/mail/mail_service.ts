@@ -1,17 +1,16 @@
 /* eslint-disable */
 
 import { SendEmailCommand, SESClient } from "@aws-sdk/client-ses";
-import { config } from 'firebase-functions';
+require('dotenv').config()
 
-// Fetch AWS credentials securely from Firebase configuration
-const AWS_ACCESS_KEY_ID = config().aws.access_key_id;
-const AWS_SECRET_ACCESS_KEY = config().aws.secret_access_key;
+// Fetch AWS credentials securely from environment variable 
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const REGION = "ap-south-1";
 
 if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
-  throw new Error('AWS credentials are not set in Firebase Functions config');
+  throw new Error('AWS credentials are missing');
 }
-
-const REGION = "ap-south-1";
 
 const sesClient = new SESClient({
   credentials: {

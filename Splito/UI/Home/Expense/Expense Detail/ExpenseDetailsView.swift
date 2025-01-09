@@ -233,7 +233,7 @@ private struct AddCommentTextField: View {
 @MainActor
 private struct ExpenseHeaderView: View {
 
-    let viewModel: ExpenseDetailsViewModel
+    @ObservedObject var viewModel: ExpenseDetailsViewModel
 
     var username: String {
         let user = viewModel.getMemberDataBy(id: viewModel.expense?.addedBy ?? "")
@@ -272,7 +272,7 @@ private struct ExpenseHeaderView: View {
 private struct ExpenseInfoView: View {
     let SUB_IMAGE_HEIGHT: CGFloat = 24
 
-    let viewModel: ExpenseDetailsViewModel
+    @ObservedObject var viewModel: ExpenseDetailsViewModel
 
     var expense: Expense? {
         viewModel.expense

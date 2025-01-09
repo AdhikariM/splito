@@ -16,6 +16,9 @@
     " ₹ 0.00" : {
 
     },
+    " commented on" : {
+      "extractionState" : "manual"
+    },
     " from the group" : {
       "extractionState" : "manual"
     },
@@ -26,6 +29,9 @@
 
     },
     " removed " : {
+      "extractionState" : "manual"
+    },
+    " to" : {
       "extractionState" : "manual"
     },
     " to %@" : {
@@ -213,6 +219,9 @@
     },
     "Ana borrows $10 from Bob" : {
 
+    },
+    "and changed the cover photo." : {
+      "extractionState" : "manual"
     },
     "Apologies, we were not able to complete the authentication process. Please try again later." : {
       "extractionState" : "manual"
@@ -403,6 +412,9 @@
     "First Name" : {
       "extractionState" : "manual"
     },
+    "for" : {
+      "extractionState" : "manual"
+    },
     "Forgot password?" : {
 
     },
@@ -474,9 +486,6 @@
     },
     "Join group" : {
 
-    },
-    "Key" : {
-      "extractionState" : "manual"
     },
     "Last Name" : {
       "extractionState" : "manual"
@@ -983,6 +992,9 @@
       "extractionState" : "manual"
     },
     "You can't remove %@ from this group because they have outstanding debts with other group members. Please make sure all of %@'s debts have been settle up, and try again." : {
+      "extractionState" : "manual"
+    },
+    "You do not have permission to add a comment on this expense, Sorry!" : {
       "extractionState" : "manual"
     },
     "You do not owe anything" : {

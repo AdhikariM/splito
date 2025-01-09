@@ -287,7 +287,7 @@ private struct ActivityLogDescriptionView: View {
 
     @ViewBuilder
     private func expenseCommentAddedDescription() -> some View {
-        let comment = activityLog.comment ?? "Some comment"
+        let comment = activityLog.comment ?? "unknown"
         highlightedText(actionUserName) + disabledText(" commented on") + highlightedText(" \"\(activityLog.expenseName ?? "")\"") +
         disabledText(" in") + highlightedText(" \"\(groupName)\":") + disabledText(" \"\(comment)\".")
     }

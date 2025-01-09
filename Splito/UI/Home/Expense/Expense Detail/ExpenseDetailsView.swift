@@ -142,11 +142,9 @@ private struct CommentListView: View {
                         let user = viewModel.getMemberDataBy(id: comment.commentedBy)
                         return viewModel.preference.user?.id == user?.id ? "You" : user?.fullName ?? "someone"
                     }
-                    var memberProfileUrl: String? {
-                        return viewModel.getMemberDataBy(id: comment.commentedBy)?.imageUrl
-                    }
-
-                    CommentCellView(comment: comment, memberName: memberName, memberProfileUrl: memberProfileUrl,
+                    
+                    CommentCellView(comment: comment, memberName: memberName,
+                                    memberProfileUrl: viewModel.getMemberDataBy(id: comment.commentedBy)?.imageUrl,
                                     isLastComment: comments.last?.id == comment.id)
                 }
             }
@@ -226,22 +224,33 @@ private struct AddCommentTextField: View {
                 .padding(.leading, 16)
                 .padding(.vertical, 12)
 
-            if showLoader {
-                ImageLoaderView()
-                    .padding(12)
-            } else {
-                Button {
-                    isFocused.wrappedValue = false
-                    onSendCommentBtnTap()
-                } label: {
-                    Image(.sendIcon)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(primaryColor)
-                        .padding(4)
-                }
-                .disabled(comment.trimming(spaces: .leadingAndTrailing).isEmpty)
+            SendButtonView(showLoader: showLoader, onClick: {
+                isFocused.wrappedValue = false
+                onSendCommentBtnTap()
+            })
+            .disabled(comment.trimming(spaces: .leadingAndTrailing).isEmpty)
+        }
+    }
+}
+
+private struct SendButtonView: View {
+    
+    let showLoader: Bool
+    
+    let onClick: () -> Void
+
+    var body: some View {
+        if showLoader {
+            ImageLoaderView()
+                .padding(12)
+        } else {
+            Button(action: onClick) {
+                Image(.sendIcon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                    .foregroundStyle(primaryColor)
+                    .padding(4)
             }
         }
     }

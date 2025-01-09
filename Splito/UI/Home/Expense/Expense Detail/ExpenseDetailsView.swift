@@ -24,42 +24,51 @@ struct ExpenseDetailsView: View {
             } else if case .loading = viewModel.viewState {
                 LoaderView()
             } else {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        ExpenseHeaderView(viewModel: viewModel)
+                ScrollViewReader { scrollViewProxy in
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            ExpenseHeaderView(viewModel: viewModel)
 
-                        ExpenseInfoView(viewModel: viewModel)
+                            ExpenseInfoView(viewModel: viewModel)
 
-                        if let imageUrl = viewModel.expense?.imageUrl, !imageUrl.isEmpty {
-                            VStack(spacing: 8) {
-                                Text("Attachment:")
-                                    .font(.subTitle3())
-                                    .foregroundStyle(disableText)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            if let imageUrl = viewModel.expense?.imageUrl, !imageUrl.isEmpty {
+                                VStack(spacing: 8) {
+                                    Text("Attachment:")
+                                        .font(.subTitle3())
+                                        .foregroundStyle(disableText)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                                AttachmentContainerView(showImageDisplayView: $showImageDisplayView, imageUrl: imageUrl)
-                                    .frame(height: 140)
-                                    .frame(maxWidth: .infinity)
-                                    .cornerRadius(12)
+                                    AttachmentContainerView(showImageDisplayView: $showImageDisplayView, imageUrl: imageUrl)
+                                        .frame(height: 140)
+                                        .frame(maxWidth: .infinity)
+                                        .cornerRadius(12)
+                                }
+                                .padding(.top, 4)
+                                .padding(.horizontal, 16)
                             }
-                            .padding(.top, 4)
-                            .padding(.horizontal, 16)
-                        }
 
-                        if let note = viewModel.expense?.note, !note.isEmpty {
-                            NoteContainerView(note: note, handleNoteTap: viewModel.handleNoteTap)
+                            if let note = viewModel.expense?.note, !note.isEmpty {
+                                NoteContainerView(note: note, handleNoteTap: {
+                                    isFocused = false
+                                    viewModel.handleNoteTap()
+                                })
                                 .padding([.top, .horizontal], 16)
+                            }
+
+                            VSpacer(16)
+
+                            CommentListView(viewModel: viewModel)
                         }
-
-                        VSpacer(16)
-
-                        CommentListView(viewModel: viewModel)
+                        .id("scrollToNewestComment")
+                        .onChange(of: viewModel.expense?.comments?.count) { _ in
+                            withAnimation {
+                                scrollViewProxy.scrollTo("scrollToNewestComment", anchor: .bottom) // Scroll to the end when a new comment is added
+                            }
+                        }
+                        .frame(maxWidth: isIpad ? 600 : nil, alignment: .center)
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
-                    .frame(maxWidth: isIpad ? 600 : nil, alignment: .center)
-                    .frame(maxWidth: .infinity, alignment: .center)
                 }
-                .scrollIndicators(.hidden)
-                .scrollBounceBehavior(.basedOnSize)
 
                 AddCommentTextField(comment: $viewModel.comment, isFocused: $isFocused,
                                     showLoader: viewModel.showLoader, onSendCommentBtnTap: viewModel.onSendCommentBtnTap)
@@ -86,10 +95,16 @@ struct ExpenseDetailsView: View {
             if viewModel.viewState != .loading {
                 if (viewModel.expense?.isActive ?? false) && (viewModel.group?.isActive ?? false) {
                     ToolbarItem(placement: .topBarTrailing) {
-                        ToolbarButtonView(imageIcon: .binIcon, onClick: viewModel.handleDeleteButtonAction)
+                        ToolbarButtonView(imageIcon: .binIcon, onClick: {
+                            isFocused = false
+                            viewModel.handleDeleteButtonAction()
+                        })
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        ToolbarButtonView(imageIcon: .editPencilIcon, onClick: viewModel.handleEditBtnAction)
+                        ToolbarButtonView(imageIcon: .editPencilIcon, onClick: {
+                            isFocused = false
+                            viewModel.handleEditBtnAction()
+                        })
                     }
                 } else {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -195,38 +210,41 @@ private struct AddCommentTextField: View {
             .frame(height: 1)
             .background(dividerColor)
 
-        HStack(alignment: .center, spacing: 16) {
+        HStack(alignment: .center, spacing: 4) {
             TextField("Add a comment", text: $comment)
                 .font(.subTitle2())
                 .tint(primaryColor)
                 .foregroundStyle(primaryText)
                 .focused(isFocused)
                 .textInputAutocapitalization(.sentences)
-                .onAppear {
-                    isFocused.wrappedValue = true
-                }
                 .padding(8)
                 .overlay(content: {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(outlineColor, lineWidth: 1)
                 })
+                .padding(.leading, 16)
+                .padding(.vertical, 12)
 
             if showLoader {
                 ImageLoaderView()
+                    .padding(12)
             } else {
                 Button {
                     isFocused.wrappedValue = false
                     onSendCommentBtnTap()
                 } label: {
-                    Image(systemName: "paperplane")
-                        .font(.system(size: 24))
+
+                    Image(.sendIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
                         .foregroundStyle(primaryColor)
+                        .padding(.vertical, 12)
+                        .padding(.trailing, 6)
                 }
                 .disabled(comment.isEmpty)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
     }
 }
 

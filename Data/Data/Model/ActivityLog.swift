@@ -81,6 +81,7 @@ public enum ActivityType: String, Codable {
     case expenseUpdated = "expense_updated"
     case expenseDeleted = "expense_deleted"
     case expenseRestored = "expense_restored"
+    case expenseCommentAdded = "expense_comment_added"
     case transactionAdded = "transaction_added"
     case transactionUpdated = "transaction_updated"
     case transactionDeleted = "transaction_deleted"

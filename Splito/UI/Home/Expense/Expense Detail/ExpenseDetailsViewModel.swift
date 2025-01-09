@@ -143,7 +143,7 @@ class ExpenseDetailsViewModel: BaseViewModel, ObservableObject {
                 newExpense.comments = updatedComments
 
                 let updatedExpense = try await expenseRepository.updateExpense(group: group, expense: newExpense,
-                                                                               oldExpense: expense, type: .expenseUpdated)
+                                                                               oldExpense: expense, type: .expenseCommentAdded)
                 NotificationCenter.default.post(name: .updateExpense, object: updatedExpense)
 
                 self.comment = ""

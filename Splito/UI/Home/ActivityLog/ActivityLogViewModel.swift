@@ -127,7 +127,7 @@ class ActivityLogViewModel: BaseViewModel, ObservableObject {
             router.push(.GroupHomeView(groupId: activity.activityId))
         case .groupMemberRemoved, .groupMemberLeft, .none:
             break
-        case .expenseAdded, .expenseUpdated, .expenseDeleted, .expenseRestored:
+        case .expenseAdded, .expenseUpdated, .expenseDeleted, .expenseRestored, .expenseCommentAdded:
             router.push(.ExpenseDetailView(groupId: activity.groupId, expenseId: activity.activityId))
         case .transactionAdded, .transactionUpdated, .transactionDeleted, .transactionRestored:
             router.push(.TransactionDetailView(transactionId: activity.activityId, groupId: activity.groupId))

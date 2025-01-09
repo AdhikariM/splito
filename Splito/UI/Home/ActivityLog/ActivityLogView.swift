@@ -174,6 +174,8 @@ private struct ActivityListCellView: View {
             return .activityGroupIcon
         case .expenseAdded, .expenseUpdated, .expenseDeleted, .expenseRestored:
             return .expenseIcon
+        case .expenseCommentAdded:
+            return .emailIcon
         case .transactionAdded, .transactionUpdated, .transactionDeleted, .transactionRestored:
             return .transactionIcon
         }
@@ -181,7 +183,7 @@ private struct ActivityListCellView: View {
 
     private func getLogSubdescription() -> String {
         switch activityLog.type {
-        case .groupCreated, .groupUpdated, .groupNameUpdated, .groupImageUpdated, .groupDeleted, .groupRestored, .groupMemberRemoved, .groupMemberLeft, .none:
+        case .groupCreated, .groupUpdated, .groupNameUpdated, .groupImageUpdated, .groupDeleted, .groupRestored, .groupMemberRemoved, .groupMemberLeft, .expenseCommentAdded, .none:
             return ""
         case .expenseAdded, .expenseUpdated, .expenseDeleted, .expenseRestored:
             let action = (amount > 0 ? "get back" : "owe")
@@ -244,6 +246,8 @@ private struct ActivityLogDescriptionView: View {
             memberRemovedDescription()
         case .expenseAdded, .expenseUpdated, .expenseDeleted, .expenseRestored:
             expenseActivityDescription()
+        case .expenseCommentAdded:
+            expenseCommentAddedDescription()
         case .transactionAdded:
             transactionAddedDescription()
         case .transactionUpdated, .transactionDeleted, .transactionRestored:
@@ -278,6 +282,12 @@ private struct ActivityLogDescriptionView: View {
     private func expenseActivityDescription() -> some View {
         let action = (type == .expenseAdded) ? "added" : (type == .expenseUpdated) ? "updated" : (type == .expenseDeleted) ? "deleted" : "restored"
         highlightedText(actionUserName) + disabledText(" \(action)") + highlightedText(" \"\(activityLog.expenseName ?? "")\"") +
+        disabledText(" in") + highlightedText(" \"\(groupName)\".")
+    }
+
+    @ViewBuilder
+    private func expenseCommentAddedDescription() -> some View {
+        highlightedText(actionUserName) + disabledText(" commented on") + highlightedText(" \"\(activityLog.expenseName ?? "")\"") +
         disabledText(" in") + highlightedText(" \"\(groupName)\".")
     }
 

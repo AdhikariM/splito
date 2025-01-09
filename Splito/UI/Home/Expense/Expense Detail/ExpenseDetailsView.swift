@@ -150,6 +150,7 @@ private struct CommentListView: View {
                                     isLastComment: comments.last?.id == comment.id)
                 }
             }
+            .padding(.bottom, 8)
         }
     }
 }

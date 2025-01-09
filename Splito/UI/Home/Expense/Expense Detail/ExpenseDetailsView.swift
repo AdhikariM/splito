@@ -70,10 +70,8 @@ struct ExpenseDetailsView: View {
                     }
                 }
 
-                if (viewModel.expense?.isActive ?? false) && (viewModel.group?.isActive ?? false) {
-                    AddCommentTextField(comment: $viewModel.comment, isFocused: $isFocused,
-                                        showLoader: viewModel.showLoader, onSendCommentBtnTap: viewModel.onSendCommentBtnTap)
-                }
+                AddCommentTextField(comment: $viewModel.comment, isFocused: $isFocused,
+                                    showLoader: viewModel.showLoader, onSendCommentBtnTap: viewModel.onSendCommentBtnTap)
             }
         }
         .background(surfaceColor)

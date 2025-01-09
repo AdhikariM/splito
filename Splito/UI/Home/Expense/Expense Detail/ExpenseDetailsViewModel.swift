@@ -126,9 +126,9 @@ class ExpenseDetailsViewModel: BaseViewModel, ObservableObject {
 
     func onSendCommentBtnTap() {
         guard let expense, let group, let userId = preference.user?.id else { return }
-        if !group.members.contains(userId) {
+        if !expense.isActive || !group.isActive || !group.members.contains(userId) {
             showAlertFor(title: "Error",
-                         message: "You do not have permission to add a comment on this expense. Only group members can comment, Sorry!")
+                         message: "You do not have permission to add a comment on this expense, Sorry!")
             return
         }
 

@@ -70,8 +70,10 @@ struct ExpenseDetailsView: View {
                     }
                 }
 
-                AddCommentTextField(comment: $viewModel.comment, isFocused: $isFocused,
-                                    showLoader: viewModel.showLoader, onSendCommentBtnTap: viewModel.onSendCommentBtnTap)
+                if (viewModel.expense?.isActive ?? false) && (viewModel.group?.isActive ?? false) {
+                    AddCommentTextField(comment: $viewModel.comment, isFocused: $isFocused,
+                                        showLoader: viewModel.showLoader, onSendCommentBtnTap: viewModel.onSendCommentBtnTap)
+                }
             }
         }
         .background(surfaceColor)
@@ -240,9 +242,9 @@ private struct AddCommentTextField: View {
                         .frame(width: 40, height: 40)
                         .foregroundStyle(primaryColor)
                         .padding(.vertical, 12)
-                        .padding(.trailing, 6)
+                        .padding(.trailing, 4)
                 }
-                .disabled(comment.isEmpty)
+                .disabled(comment.trimming(spaces: .leadingAndTrailing).isEmpty)
             }
         }
     }

@@ -25,6 +25,7 @@ public struct ActivityLog: Codable, Identifiable, Hashable {
     public let previousGroupName: String?
     public let removedMemberName: String?
     public let expenseName: String?
+    public let comment: String?
     public let payerName: String?
     public let receiverName: String?
     public let paymentReason: String?
@@ -32,8 +33,9 @@ public struct ActivityLog: Codable, Identifiable, Hashable {
 
     public init(type: ActivityType, groupId: String, activityId: String, groupName: String,
                 actionUserName: String, recordedOn: Timestamp, previousGroupName: String? = nil,
-                removedMemberName: String? = nil, expenseName: String? = nil, payerName: String? = nil,
-                receiverName: String? = nil, paymentReason: String? = nil, amount: Double? = nil) {
+                removedMemberName: String? = nil, expenseName: String? = nil, comment: String? = nil,
+                payerName: String? = nil, receiverName: String? = nil, paymentReason: String? = nil,
+                amount: Double? = nil) {
         self.type = type
         self.groupId = groupId
         self.activityId = activityId
@@ -43,6 +45,7 @@ public struct ActivityLog: Codable, Identifiable, Hashable {
         self.previousGroupName = previousGroupName
         self.removedMemberName = removedMemberName
         self.expenseName = expenseName
+        self.comment = comment
         self.payerName = payerName
         self.receiverName = receiverName
         self.paymentReason = paymentReason
@@ -60,6 +63,7 @@ public struct ActivityLog: Codable, Identifiable, Hashable {
         case previousGroupName = "previous_group_name"
         case removedMemberName = "removed_member_name"
         case expenseName = "expense_name"
+        case comment
         case payerName = "payer_name"
         case receiverName = "receiver_name"
         case paymentReason = "payment_reason"

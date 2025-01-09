@@ -21,9 +21,11 @@ class ExpenseDetailsViewModel: BaseViewModel, ObservableObject {
     @Published private(set) var expenseUsersData: [AppUser] = []
     @Published private(set) var viewState: ViewState = .loading
 
+    @Published var comment: String = ""
     @Published var expenseNote: String = ""
     @Published private(set) var groupImageUrl: String = ""
 
+    @Published var showLoader: Bool = false
     @Published var showAddNoteEditor = false
     @Published var showEditExpenseSheet = false
 
@@ -120,6 +122,35 @@ class ExpenseDetailsViewModel: BaseViewModel, ObservableObject {
         guard let expense, expense.isActive, let userId = preference.user?.id,
               let group, group.members.contains(userId) else { return }
         showAddNoteEditor = true
+    }
+
+    func onSendCommentBtnTap() {
+        guard let expense, expense.isActive, let userId = preference.user?.id,
+              let group, group.members.contains(userId) else { return }
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                self.showLoader = true
+
+                var newExpense = expense
+                var updatedComments = expense.comments ?? []
+                updatedComments.append(Comments(id: UUID().uuidString, comment: self.comment.trimming(spaces: .leadingAndTrailing), commentedBy: userId))
+                newExpense.comments = updatedComments
+
+                let updatedExpense = try await expenseRepository.updateExpense(group: group, expense: newExpense,
+                                                                               oldExpense: expense, type: .expenseUpdated)
+                NotificationCenter.default.post(name: .updateExpense, object: updatedExpense)
+
+                self.comment = ""
+                self.showLoader = false
+                LogD("AddExpenseViewModel: \(#function) Expense updated successfully.")
+            } catch {
+                self.showLoader = false
+                LogE("AddExpenseViewModel: \(#function) Failed to update expense \(expenseId): \(error).")
+                self.showToastForError()
+            }
+        }
     }
 
     func handleEditBtnAction() {
@@ -266,11 +297,8 @@ class ExpenseDetailsViewModel: BaseViewModel, ObservableObject {
 
     @objc private func getUpdatedExpense(notification: Notification) {
         guard let updatedExpense = notification.object as? Expense else { return }
-
-        viewState = .loading
         Task {
             await processExpense(expense: updatedExpense)
-            viewState = .initial
         }
     }
 

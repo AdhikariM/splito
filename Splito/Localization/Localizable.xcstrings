@@ -123,6 +123,9 @@
     "%lld people" : {
 
     },
+    "•" : {
+
+    },
     "₹ %@ of %@" : {
       "extractionState" : "manual"
     },
@@ -154,6 +157,9 @@
       "extractionState" : "manual"
     },
     "Activity" : {
+
+    },
+    "Add a comment" : {
 
     },
     "Add a new member" : {
@@ -272,6 +278,9 @@
       "extractionState" : "manual"
     },
     "Choose from Library" : {
+
+    },
+    "Comments:" : {
 
     },
     "Contact Support" : {

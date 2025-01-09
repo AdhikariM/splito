@@ -83,10 +83,25 @@ public struct Expense: Codable, Hashable, Identifiable {
 }
 
 public struct Comments: Codable, Hashable {
+
     public var id: String
     public var comment: String
     public var commentedBy: String
     public var commentedAt: Timestamp
+
+    public init(id: String, comment: String, commentedBy: String, commentedAt: Timestamp = Timestamp()) {
+        self.id = id
+        self.comment = comment
+        self.commentedBy = commentedBy
+        self.commentedAt = commentedAt
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case comment = "comment"
+        case commentedBy = "commented_by"
+        case commentedAt = "commented_at"
+    }
 }
 
 extension Expense {

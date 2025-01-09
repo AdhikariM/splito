@@ -8,11 +8,13 @@
 import SwiftUI
 import BaseStyle
 import Data
+import FirebaseFirestore
 
 struct ExpenseDetailsView: View {
 
     @StateObject var viewModel: ExpenseDetailsViewModel
 
+    @FocusState var isFocused: Bool
     @State private var showImageDisplayView = false
 
     var body: some View {
@@ -41,21 +43,26 @@ struct ExpenseDetailsView: View {
                                     .cornerRadius(12)
                             }
                             .padding(.top, 4)
+                            .padding(.horizontal, 16)
                         }
 
                         if let note = viewModel.expense?.note, !note.isEmpty {
                             NoteContainerView(note: note, handleNoteTap: viewModel.handleNoteTap)
-                                .padding(.top, 16)
+                                .padding([.top, .horizontal], 16)
                         }
 
-                        VSpacer(24)
+                        VSpacer(16)
+
+                        CommentListView(viewModel: viewModel)
                     }
-                    .padding(.horizontal, 16)
                     .frame(maxWidth: isIpad ? 600 : nil, alignment: .center)
                     .frame(maxWidth: .infinity, alignment: .center)
                 }
                 .scrollIndicators(.hidden)
                 .scrollBounceBehavior(.basedOnSize)
+
+                AddCommentTextField(comment: $viewModel.comment, isFocused: $isFocused,
+                                    showLoader: viewModel.showLoader, onSendCommentBtnTap: viewModel.onSendCommentBtnTap)
             }
         }
         .background(surfaceColor)
@@ -96,6 +103,130 @@ struct ExpenseDetailsView: View {
                 AttachmentZoomView(imageUrl: imageUrl)
             }
         }
+        .onTapGesture {
+            isFocused = false
+        }
+    }
+}
+
+private struct CommentListView: View {
+
+    @ObservedObject var viewModel: ExpenseDetailsViewModel
+
+    var body: some View {
+        if let comments = viewModel.expense?.comments, !comments.isEmpty {
+            VStack(spacing: 8) {
+                Text("Comments:")
+                    .font(.subTitle3())
+                    .foregroundStyle(disableText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+
+                ForEach(comments.uniqued(), id: \.id) { comment in
+                    var memberName: String {
+                        let user = viewModel.getMemberDataBy(id: comment.commentedBy)
+                        return viewModel.preference.user?.id == user?.id ? "You" : user?.fullName ?? "someone"
+                    }
+                    var memberProfileUrl: String? {
+                        return viewModel.getMemberDataBy(id: comment.commentedBy)?.imageUrl
+                    }
+
+                    CommentCellView(comment: comment, memberName: memberName, memberProfileUrl: memberProfileUrl,
+                                    isLastComment: comments.last?.id == comment.id)
+                }
+            }
+        }
+    }
+}
+
+private struct CommentCellView: View {
+
+    var comment: Comments
+    var memberName: String
+    var memberProfileUrl: String?
+    var isLastComment: Bool
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            MemberProfileImageView(imageUrl: memberProfileUrl)
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 4) {
+                    Text(memberName)
+                        .font(.Header1(15))
+                        .foregroundColor(primaryText)
+
+                    Text("•")
+                        .font(.caption1())
+                        .foregroundColor(disableText)
+
+                    Text(comment.commentedAt.dateValue().getFormattedPastTime())
+                        .font(.caption1(12))
+                        .foregroundColor(disableText)
+                }
+
+                Text(comment.comment)
+                    .font(.body3(15))
+                    .foregroundColor(primaryText)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(16)
+
+        if !isLastComment {
+            Divider()
+                .frame(height: 1)
+                .background(dividerColor)
+        }
+    }
+}
+
+private struct AddCommentTextField: View {
+
+    @Binding var comment: String
+    var isFocused: FocusState<Bool>.Binding
+
+    let showLoader: Bool
+    let onSendCommentBtnTap: () -> Void
+
+    var body: some View {
+        Divider()
+            .frame(height: 1)
+            .background(dividerColor)
+
+        HStack(alignment: .center, spacing: 16) {
+            TextField("Add a comment", text: $comment)
+                .font(.subTitle2())
+                .tint(primaryColor)
+                .foregroundStyle(primaryText)
+                .focused(isFocused)
+                .textInputAutocapitalization(.sentences)
+                .onAppear {
+                    isFocused.wrappedValue = true
+                }
+                .padding(8)
+                .overlay(content: {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(outlineColor, lineWidth: 1)
+                })
+
+            if showLoader {
+                ImageLoaderView()
+            } else {
+                Button {
+                    isFocused.wrappedValue = false
+                    onSendCommentBtnTap()
+                } label: {
+                    Image(systemName: "paperplane")
+                        .font(.system(size: 24))
+                        .foregroundStyle(primaryColor)
+                }
+                .disabled(comment.isEmpty)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 12)
     }
 }
 
@@ -133,6 +264,7 @@ private struct ExpenseHeaderView: View {
         .background(container2Color)
         .cornerRadius(12)
         .padding(.top, 24)
+        .padding(.horizontal, 16)
     }
 }
 
@@ -206,6 +338,7 @@ private struct ExpenseInfoView: View {
             .foregroundStyle(disableText)
         }
         .padding(.top, 24)
+        .padding(.horizontal, 16)
     }
 }
 

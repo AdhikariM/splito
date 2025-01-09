@@ -175,7 +175,7 @@ private struct ActivityListCellView: View {
         case .expenseAdded, .expenseUpdated, .expenseDeleted, .expenseRestored:
             return .expenseIcon
         case .expenseCommentAdded:
-            return .emailIcon
+            return .commentIcon
         case .transactionAdded, .transactionUpdated, .transactionDeleted, .transactionRestored:
             return .transactionIcon
         }

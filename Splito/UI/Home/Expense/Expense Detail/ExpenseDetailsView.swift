@@ -234,14 +234,12 @@ private struct AddCommentTextField: View {
                     isFocused.wrappedValue = false
                     onSendCommentBtnTap()
                 } label: {
-
                     Image(.sendIcon)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
                         .foregroundStyle(primaryColor)
-                        .padding(.vertical, 12)
-                        .padding(.trailing, 4)
+                        .padding(4)
                 }
                 .disabled(comment.trimming(spaces: .leadingAndTrailing).isEmpty)
             }
